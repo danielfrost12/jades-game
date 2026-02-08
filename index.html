@@ -182,6 +182,13 @@ canvas#game {
   font-weight: 700;
   color: var(--gold);
 }
+.yard-line {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 .quarter-time {
   font-size: 13px;
   font-weight: 600;
@@ -759,7 +766,8 @@ canvas#game {
     </div>
     <div class="game-info">
       <div class="down-distance" id="down-distance">1ST & 10</div>
-      <div class="quarter-time" id="quarter-time">Q1 15:00</div>
+      <div class="yard-line" id="yard-line">OWN 25</div>
+      <div class="quarter-time" id="quarter-time">Q1 5:00</div>
     </div>
   </div>
 </div>
@@ -833,7 +841,7 @@ let currentGame = 0;
 let patsScore = 0, seaScore = 0;
 let down = 1, yardsToGo = 10;
 let ballYard = 25;
-let quarter = 1, gameClock = 900;
+let quarter = 1, gameClock = 300;
 let isPatsOffense = true;
 let driveCount = 0;
 let playsThisDrive = 0;
@@ -847,7 +855,7 @@ let momentQueue = [];
 let commentaryQueue = [];
 let currentCommentary = null;
 let commentaryTimer = 0;
-let totalDrivesPerHalf = 5;
+let totalDrivesPerHalf = 3;
 let lastFrameTime = 0;
 let pendingResolve = null; // deferred play resolution callback
 let gameTimeouts = []; // track all game timeouts for cleanup
@@ -948,6 +956,7 @@ const MOMENTS = {
   clock: { emoji: '⏱️', title: 'The Game Clock', body: '<strong>Running plays</strong> keep the clock running. <strong>Incomplete passes</strong> and going <strong>out of bounds</strong> stop it.' },
   two_minute: { emoji: '🔥', title: 'Two-Minute Warning!', body: 'Under 2 minutes! Every second counts. Use pass plays to stop the clock if you need to score fast.' },
   two_point: { emoji: '2️⃣', title: 'Two-Point Conversion', body: 'Instead of kicking for 1 point, try scoring from the 2-yard line for <strong>2 points</strong>. Risky but great for catching up!' },
+  punt: { emoji: '🦶', title: 'Punting', body: 'On 4th down, you usually <strong>punt</strong> — kick the ball to the other team. You give up the ball, but they start far from your end zone. It\'s the safe play!' },
 };
 
 // ---- ESPN COMMENTARY (Human-like announcer lines) ----
@@ -1031,6 +1040,10 @@ const COMMENTARY = {
   ],
   FG_MISS: [
     { pbp: "No good! Wide right!", color: "Just missed it. That's tough. They'll wish they had those 3 points later." },
+  ],
+  PUNT: [
+    { pbp: "And the punt is away! Good hang time.", color: "Smart play. Give up the ball but pin them deep. That's football IQ!" },
+    { pbp: "Punt team out — big boot downfield!", color: "Can't always go for it on 4th down. Sometimes the smart play is to punt and play defense." },
   ],
 };
 
@@ -1771,6 +1784,51 @@ function drawPlayAnimation(play) {
   if (t > 0.8 && t < 0.95) cameraShake = (1 - (t - 0.8) / 0.15) * 4;
 }
 
+// ---- SEAHAWKS OFFENSE RENDERER ----
+function drawSeaOffense() {
+  // Draw Seahawks as offense, Patriots as defense
+  // Animate a slow movement to simulate the drive
+  const t = ((Date.now() / 1000) % 4) / 4; // continuous 4s loop
+
+  // Seahawks offensive players (green)
+  const seaOff = [
+    { wx: 0, wy: 0.2, role: 'QB', label: 'QB' },
+    { wx: 0.05, wy: 0.15, role: 'RB', label: 'RB' },
+    { wx: -0.16, wy: 0.25 }, { wx: -0.08, wy: 0.25 }, { wx: 0, wy: 0.25 }, { wx: 0.08, wy: 0.25 }, { wx: 0.16, wy: 0.25 },
+    { wx: -0.4, wy: 0.26, role: 'WR', label: 'WR' },
+    { wx: 0.4, wy: 0.26, role: 'WR', label: 'WR' },
+  ];
+  // Patriots defense (blue/red)
+  const patsDef = [
+    { wx: -0.12, wy: 0.29 }, { wx: -0.04, wy: 0.29 }, { wx: 0.04, wy: 0.29 }, { wx: 0.12, wy: 0.29 },
+    { wx: -0.15, wy: 0.35, label: 'LB' }, { wx: 0, wy: 0.37, label: 'LB' }, { wx: 0.15, wy: 0.35, label: 'LB' },
+    { wx: -0.4, wy: 0.42, label: 'CB' }, { wx: 0.4, wy: 0.42, label: 'CB' },
+    { wx: -0.1, wy: 0.5, label: 'S' }, { wx: 0.1, wy: 0.5, label: 'S' },
+  ];
+
+  // Animate Seahawks slowly moving upfield
+  for (const p of patsDef) {
+    drawPlayer(p.wx, p.wy - t * 0.02, PATS.primary, PATS.secondary, false, p.label || '');
+  }
+  for (const p of seaOff) {
+    const dy = t * 0.08;
+    const dx = (p.role === 'WR' ? (p.wx < 0 ? -1 : 1) * t * 0.03 : 0);
+    drawPlayer(p.wx + dx, p.wy + dy, SEA.primary, SEA.secondary, false, p.label || '');
+  }
+  // Ball with QB/RB
+  drawBall(0, 0.2 + t * 0.08, false);
+
+  // "DEFENSE" label on screen
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.fillRect(0, H * 0.42, W, 36);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 14px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🛡️  SEAHAWKS POSSESSION  🛡️', W / 2, H * 0.42 + 24);
+  ctx.restore();
+}
+
 // ---- COMMENTARY SYSTEM ----
 function showCommentary(pbp, color, duration) {
   commentaryQueue.push({ pbp, color, duration: duration || 4000 });
@@ -1886,7 +1944,12 @@ function updateScoreboard() {
   $('pats-score').textContent = patsScore;
   $('sea-score').textContent = seaScore;
   const ordinals = ['', '1ST', '2ND', '3RD', '4TH'];
-  $('down-distance').textContent = `${ordinals[down] || '4TH'} & ${yardsToGo}`;
+  $('down-distance').textContent = isPatsOffense
+    ? `${ordinals[down] || '4TH'} & ${yardsToGo}`
+    : 'DEF';
+  // Yard line display: "OWN 25" or "SEA 45" etc
+  const displayYard = ballYard <= 50 ? `OWN ${ballYard}` : `SEA ${100 - ballYard}`;
+  $('yard-line').textContent = isPatsOffense ? `🏈 ${displayYard}` : '🛡️ DEFENSE';
   const mins = Math.floor(gameClock / 60);
   const secs = gameClock % 60;
   $('quarter-time').textContent = `Q${quarter} ${mins}:${secs.toString().padStart(2, '0')}`;
@@ -1902,8 +1965,13 @@ function showPlayCards() {
   const gameDef = GAME_DEFS[currentGame];
   let plays = [...gameDef.plays];
 
-  if (currentGame >= 2 && down === 4 && ballYard >= 55) {
-    plays.push({ id: 'field_goal', name: 'Field Goal', icon: '🥅', desc: '3 points!', type: 'kick' });
+  if (down === 4) {
+    // Always offer punt on 4th down
+    plays.push({ id: 'punt', name: 'Punt', icon: '🦶', desc: 'Kick it away (safe)', type: 'punt' });
+    // Offer FG in games 3+ when in range
+    if (currentGame >= 2 && ballYard >= 55) {
+      plays.push({ id: 'field_goal', name: 'Field Goal', icon: '🥅', desc: '3 points!', type: 'kick' });
+    }
   }
 
   playCardsEl.innerHTML = '';
@@ -1931,6 +1999,7 @@ function selectPlay(play) {
   hidePlayCards();
 
   if (play.type === 'kick') { executeFieldGoal(); return; }
+  if (play.type === 'punt') { executePunt(); return; }
 
   setupFormation(play.type);
   gameState = 'SNAP_WAIT';
@@ -2001,6 +2070,28 @@ function executeFieldGoal() {
       endPossession();
     }
   }, 3500);
+}
+
+function executePunt() {
+  gameState = 'PLAY_ACTIVE';
+  queueMoment('punt');
+
+  const puntLine = pickRandom(COMMENTARY.PUNT);
+  showCommentary(puntLine.pbp, puntLine.color, 3000);
+  playSound('hit');
+
+  advanceClock(20);
+
+  gameTimeout(() => {
+    if (gameState === 'ENDING' || gameState === 'GAME_OVER') return;
+    gameState = 'PLAY_RESULT';
+    if (momentQueue.length > 0) {
+      setPendingResolve(() => endPossession());
+      showNextMoment();
+    } else {
+      endPossession();
+    }
+  }, 2500);
 }
 
 function setPendingResolve(fn) {
@@ -2209,48 +2300,92 @@ function endPossession() {
   driveCount++;
   playsThisDrive = 0;
 
-  const seaScoreChance = GAME_DEFS[currentGame].defDifficulty;
-  if (Math.random() < seaScoreChance) {
-    const seaTD = Math.random() > 0.3;
-    if (seaTD) {
-      seaScore += 7;
-      const line = pickRandom(COMMENTARY.SEA_TD);
-      showCommentary(line.pbp, line.color, 3500);
-    } else {
-      seaScore += 3;
-      const line = pickRandom(COMMENTARY.SEA_FG);
-      showCommentary(line.pbp, line.color, 3000);
-    }
-    playSound('crowd_roar');
-  } else {
-    const line = pickRandom(COMMENTARY.SEA_PUNT);
-    showCommentary(line.pbp, line.color, 3000);
-  }
-
+  // Switch to Seahawks offense — show defensive phase
+  isPatsOffense = false;
+  gameState = 'SEA_OFFENSE';
+  hidePlayCards();
   updateScoreboard();
 
-  if (driveCount >= totalDrivesPerHalf * 2) {
-    gameState = 'ENDING';
-    gameTimeout(() => endGame(), 3000);
-    return;
-  }
+  // Seahawks drive plays out visually over a few seconds
+  const seaScoreChance = GAME_DEFS[currentGame].defDifficulty;
+  const seaScores = Math.random() < seaScoreChance;
+  const seaTD = seaScores && Math.random() > 0.3;
 
-  // Quarter transitions
-  if (driveCount === totalDrivesPerHalf) {
-    quarter = 3; gameClock = 900;
-    showCommentary("Second half begins!", "Let's keep this momentum going!", 3000);
+  // Start with commentary
+  showCommentary("Seahawks take over on offense.", "Time for YOUR defense to step up!", 2500);
+
+  // Simulate Seahawks driving — show a few quick updates
+  seaBallYard = 25;
+  advanceClock(30);
+
+  gameTimeout(() => {
+    if (gameState === 'ENDING' || gameState === 'GAME_OVER') return;
+    if (seaScores) {
+      seaBallYard = 50 + Math.floor(Math.random() * 20);
+      updateScoreboard();
+      const midLine = seaTD
+        ? { pbp: "Wilson finds a gap — Seahawks moving!", color: "They're driving downfield. The defense needs a stop!" }
+        : { pbp: "Seattle pushing into field goal range...", color: "The defense is bending. Can they hold?" };
+      showCommentary(midLine.pbp, midLine.color, 2500);
+      advanceClock(40);
+    } else {
+      showCommentary("Defense holds! Seahawks go 3 and out!", "GREAT stop! That's what I like to see!", 2500);
+      advanceClock(35);
+    }
+  }, 2500);
+
+  gameTimeout(() => {
+    if (gameState === 'ENDING' || gameState === 'GAME_OVER') return;
+    if (seaScores) {
+      if (seaTD) {
+        seaScore += 7;
+        const line = pickRandom(COMMENTARY.SEA_TD);
+        showCommentary(line.pbp, line.color, 3500);
+        playSound('crowd_groan');
+      } else {
+        seaScore += 3;
+        const line = pickRandom(COMMENTARY.SEA_FG);
+        showCommentary(line.pbp, line.color, 3000);
+        playSound('crowd_groan');
+      }
+    } else {
+      const line = pickRandom(COMMENTARY.SEA_PUNT);
+      showCommentary(line.pbp, line.color, 3000);
+    }
     updateScoreboard();
-  }
-  if (driveCount === Math.floor(totalDrivesPerHalf * 0.5)) { quarter = 2; gameClock = 900; updateScoreboard(); }
-  if (driveCount === Math.floor(totalDrivesPerHalf * 1.5)) { quarter = 4; gameClock = 900; updateScoreboard(); }
+    advanceClock(25);
+  }, 5000);
 
-  isPatsOffense = true;
-  ballYard = 20 + Math.floor(Math.random() * 10);
-  down = 1;
-  yardsToGo = 10;
+  // After Seahawks drive, switch back to Patriots offense
+  gameTimeout(() => {
+    if (gameState === 'ENDING' || gameState === 'GAME_OVER') return;
 
-  gameTimeout(() => startNextPlay(), 2500);
+    if (driveCount >= totalDrivesPerHalf * 2) {
+      gameState = 'ENDING';
+      gameTimeout(() => endGame(), 2000);
+      return;
+    }
+
+    // Quarter transitions
+    if (driveCount === totalDrivesPerHalf) {
+      quarter = 3; gameClock = 300;
+      showCommentary("Second half begins!", "Let's keep this momentum going!", 3000);
+    }
+    if (driveCount === Math.floor(totalDrivesPerHalf * 0.5)) { quarter = 2; gameClock = 300; }
+    if (driveCount === Math.floor(totalDrivesPerHalf * 1.5)) { quarter = 4; gameClock = 300; }
+
+    isPatsOffense = true;
+    ballYard = 20 + Math.floor(Math.random() * 10);
+    down = 1;
+    yardsToGo = 10;
+    updateScoreboard();
+
+    showCommentary("Patriots ball! Your turn to score.", "Let's put together a drive!", 2500);
+    gameTimeout(() => startNextPlay(), 2000);
+  }, 7500);
 }
+
+let seaBallYard = 25;
 
 function startNextPlay() {
   // Don't start plays if game is ending or already over
@@ -2355,7 +2490,7 @@ function startNewGame() {
   snapPrompt.classList.remove('visible');
   patsScore = 0; seaScore = 0;
   down = 1; yardsToGo = 10;
-  ballYard = 25; quarter = 1; gameClock = 900;
+  ballYard = 25; quarter = 1; gameClock = 300;
   driveCount = 0; playsThisDrive = 0;
   isPatsOffense = true; particles = [];
   momentQueue = []; pendingResolve = null;
@@ -2550,7 +2685,7 @@ function loadState() {
     yardsToGo = state.yardsToGo || 10;
     ballYard = state.ballYard || 25;
     quarter = state.quarter || 1;
-    gameClock = state.gameClock || 900;
+    gameClock = state.gameClock || 300;
     driveCount = state.driveCount || 0;
     playsThisDrive = state.playsThisDrive || 0;
     isPatsOffense = state.isPatsOffense !== false;
@@ -2739,7 +2874,9 @@ function render(time) {
   if (gameState !== 'TITLE' && gameState !== 'TUNNEL' && gameState !== 'MATCHUP') {
     drawField();
 
-    if (gameState === 'PLAY_CALL' || gameState === 'SNAP_WAIT' || gameState === 'MOMENT' || gameState === 'INTRO' || gameState === 'ENDING') {
+    if (gameState === 'SEA_OFFENSE') {
+      drawSeaOffense();
+    } else if (gameState === 'PLAY_CALL' || gameState === 'SNAP_WAIT' || gameState === 'MOMENT' || gameState === 'INTRO' || gameState === 'ENDING') {
       drawFormation(false);
       drawBall(0, 0.22, false);
     } else if (gameState === 'PASS_TARGET') {

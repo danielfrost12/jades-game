@@ -2311,27 +2311,16 @@ function startNewGame() {
   saveState();
 }
 
-// ---- TUNNEL SEQUENCE (Michigan Stadium style) ----
-// POV: You're a Patriots player running out of a narrow concrete tunnel
-// into a wall of light, smoke, pyrotechnics, and 70,000 screaming fans
-
+// ---- TUNNEL SEQUENCE ----
 const tunnelTexts = [
   "SUPER BOWL SUNDAY",
   "From Gillette Stadium...",
   "The New England Patriots take the field!",
+  "And on the other side... the Seattle Seahawks.",
   "If you're new to football — don't worry.",
   "We'll teach you everything.",
-  "LET'S GO!!"
+  "LET'S PLAY SOME FOOTBALL!"
 ];
-
-// Tunnel particle system (separate from game particles)
-let tunnelParticles = [];
-let tunnelSparks = [];
-let tunnelSmoke = [];
-let tunnelTeammates = []; // silhouettes running ahead of you
-let tunnelCameraShake = 0;
-let tunnelSpeed = 0; // how fast we're running (0 to 1)
-let tunnelProgress = 0; // 0 = deep in tunnel, 1 = out on field
 
 function startTunnel() {
   gameState = 'TUNNEL';
@@ -2341,39 +2330,8 @@ function startTunnel() {
   tunnelLight = 0;
   tunnelAborted = false;
   tunnelTimeouts = [];
-  tunnelParticles = [];
-  tunnelSparks = [];
-  tunnelSmoke = [];
-  tunnelSpeed = 0;
-  tunnelProgress = 0;
-  tunnelCameraShake = 0;
-
-  // Pre-generate teammates running ahead (silhouettes)
-  tunnelTeammates = [];
-  for (let i = 0; i < 5; i++) {
-    tunnelTeammates.push({
-      x: (Math.random() - 0.5) * 0.6, // lateral position in tunnel
-      z: 0.3 + Math.random() * 0.5, // distance ahead
-      bobPhase: Math.random() * TAU,
-      speed: 0.8 + Math.random() * 0.4,
-      armPhase: Math.random() * TAU,
-    });
-  }
-
-  // Pre-generate smoke puffs
-  for (let i = 0; i < 30; i++) {
-    tunnelSmoke.push({
-      x: (Math.random() - 0.5) * 1.2,
-      z: Math.random() * 1.2,
-      size: 30 + Math.random() * 60,
-      alpha: 0.05 + Math.random() * 0.15,
-      drift: (Math.random() - 0.5) * 0.002,
-    });
-  }
-
   showTunnelText(0);
   startCrowdAmbient();
-  setCrowdVolume(0.15); // muffled in tunnel
 }
 
 function showTunnelText(index) {
@@ -2386,11 +2344,11 @@ function showTunnelText(index) {
     if (tunnelAborted) return;
     textEl.textContent = tunnelTexts[index];
     textEl.classList.add('visible');
-    const delay = index === 0 ? 1800 : index === tunnelTexts.length - 1 ? 1200 : 1600;
+    const delay = index === 0 ? 2000 : index === tunnelTexts.length - 1 ? 1500 : 2200;
     const t2 = setTimeout(() => {
       if (tunnelAborted) return;
       textEl.classList.remove('visible');
-      const t3 = setTimeout(() => { if (!tunnelAborted) showTunnelText(index + 1); }, 300);
+      const t3 = setTimeout(() => { if (!tunnelAborted) showTunnelText(index + 1); }, 400);
       tunnelTimeouts.push(t3);
     }, delay);
     tunnelTimeouts.push(t2);
@@ -2400,294 +2358,53 @@ function showTunnelText(index) {
 
 function drawTunnel() {
   const elapsed = (Date.now() - tunnelStartTime) / 1000;
-  const totalDuration = tunnelTexts.length * 1.8;
+  tunnelLight = Math.min(1, elapsed / (tunnelTexts.length * 2.5));
 
-  // Progress: 0 = start of tunnel, 1 = burst onto field
-  tunnelProgress = Math.min(1, elapsed / totalDuration);
-  // Speed ramps up as we get closer to the exit
-  tunnelSpeed = 0.3 + tunnelProgress * 0.7;
-  // Light increases dramatically near the end
-  tunnelLight = Math.pow(tunnelProgress, 2.5);
+  tunnelCtx.fillStyle = '#000';
+  tunnelCtx.fillRect(0, 0, W, H);
 
-  // Camera shake increases as crowd gets louder
-  if (tunnelProgress > 0.6) {
-    tunnelCameraShake = (tunnelProgress - 0.6) * 8;
-  }
+  const cx = W / 2, cy = H / 2;
+  const tunnelWidth = W * 0.85, tunnelHeight = H * 0.7;
+  const outerRad = Math.max(tunnelWidth, tunnelHeight) * 0.5;
+  const innerRad = outerRad * (0.1 + tunnelLight * 0.9);
 
-  // Crowd volume increases as we approach exit
-  setCrowdVolume(0.15 + tunnelProgress * 0.85);
+  const grad = tunnelCtx.createRadialGradient(cx, cy * 0.8, innerRad * 0.1, cx, cy * 0.8, innerRad);
+  grad.addColorStop(0, `rgba(200,220,255,${tunnelLight * 0.8})`);
+  grad.addColorStop(0.3, `rgba(100,150,200,${tunnelLight * 0.3})`);
+  grad.addColorStop(0.7, `rgba(20,40,60,${tunnelLight * 0.1})`);
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  tunnelCtx.fillStyle = grad;
+  tunnelCtx.fillRect(0, 0, W, H);
 
-  const ctx = tunnelCtx;
-  const cx = W / 2, cy = H * 0.45;
-
-  // Apply camera shake
-  ctx.save();
-  if (tunnelCameraShake > 0.5) {
-    ctx.translate(
-      (Math.random() - 0.5) * tunnelCameraShake,
-      (Math.random() - 0.5) * tunnelCameraShake * 0.5
-    );
-  }
-
-  // === BACKGROUND: Dark concrete ===
-  ctx.fillStyle = '#0a0a0a';
-  ctx.fillRect(0, 0, W, H);
-
-  // === TUNNEL WALLS (perspective narrowing corridor) ===
-  const wallNarrow = 0.15 + tunnelProgress * 0.35; // walls spread as we exit
-  const vanishY = cy - H * 0.1;
-
-  // Concrete walls — left
-  const wallGradL = ctx.createLinearGradient(0, 0, W * 0.35, 0);
-  wallGradL.addColorStop(0, '#1a1a1a');
-  wallGradL.addColorStop(0.5, '#252525');
-  wallGradL.addColorStop(1, '#1a1a1a');
-  ctx.fillStyle = wallGradL;
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(W * wallNarrow, vanishY);
-  ctx.lineTo(W * wallNarrow, H);
-  ctx.lineTo(0, H);
-  ctx.fill();
-
-  // Concrete walls — right
-  ctx.fillStyle = wallGradL;
-  ctx.beginPath();
-  ctx.moveTo(W, 0);
-  ctx.lineTo(W * (1 - wallNarrow), vanishY);
-  ctx.lineTo(W * (1 - wallNarrow), H);
-  ctx.lineTo(W, H);
-  ctx.fill();
-
-  // Ceiling
-  ctx.fillStyle = '#111';
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(W, 0);
-  ctx.lineTo(W * (1 - wallNarrow), vanishY);
-  ctx.lineTo(W * wallNarrow, vanishY);
-  ctx.fill();
-
-  // Floor
-  const floorGrad = ctx.createLinearGradient(0, H * 0.7, 0, H);
-  floorGrad.addColorStop(0, '#1a1a1a');
-  floorGrad.addColorStop(1, '#222');
-  ctx.fillStyle = floorGrad;
-  ctx.beginPath();
-  ctx.moveTo(W * wallNarrow, H);
-  ctx.lineTo(W * (1 - wallNarrow), H);
-  ctx.lineTo(W * (1 - wallNarrow), vanishY + H * 0.15);
-  ctx.lineTo(W * wallNarrow, vanishY + H * 0.15);
-  ctx.fill();
-
-  // Wall details — pipes, rivets, concrete lines
-  ctx.strokeStyle = 'rgba(60,60,60,0.3)';
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 8; i++) {
-    const yy = vanishY + i * (H - vanishY) / 8;
-    const spread = (yy - vanishY) / (H - vanishY);
-    const lx = W * wallNarrow - spread * W * wallNarrow;
-    const rx = W * (1 - wallNarrow) + spread * W * wallNarrow;
-    ctx.beginPath();
-    ctx.moveTo(lx, yy); ctx.lineTo(lx + 3, yy);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(rx, yy); ctx.lineTo(rx - 3, yy);
-    ctx.stroke();
-  }
-
-  // === LIGHT AT THE END (the field) ===
-  const lightSize = 0.05 + tunnelProgress * 0.95;
-  const lightW = W * 0.3 * lightSize;
-  const lightH = H * 0.25 * lightSize;
-
-  // Bright daylight glow
-  const lightGrad = ctx.createRadialGradient(cx, vanishY, 0, cx, vanishY, Math.max(lightW, lightH));
-  const lightIntensity = Math.min(1, tunnelLight * 1.5);
-  lightGrad.addColorStop(0, `rgba(255,255,240,${lightIntensity})`);
-  lightGrad.addColorStop(0.2, `rgba(200,230,200,${lightIntensity * 0.7})`);
-  lightGrad.addColorStop(0.5, `rgba(100,180,100,${lightIntensity * 0.3})`);
-  lightGrad.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = lightGrad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Green field glow (visible when close)
-  if (tunnelProgress > 0.4) {
-    const fieldAlpha = (tunnelProgress - 0.4) * 1.5;
-    const fGrad = ctx.createRadialGradient(cx, vanishY + 10, 0, cx, vanishY + 10, lightW * 1.5);
-    fGrad.addColorStop(0, `rgba(46,125,50,${Math.min(0.6, fieldAlpha * 0.4)})`);
-    fGrad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = fGrad;
-    ctx.fillRect(0, 0, W, H);
-  }
-
-  // === SMOKE / FOG ===
-  for (const s of tunnelSmoke) {
-    s.x += s.drift;
-    const sz = s.z - tunnelProgress * 0.3; // smoke drifts past us as we move
-    if (sz < 0) continue;
-    const screenScale = 1 / (0.3 + sz);
-    const sx = cx + s.x * W * screenScale;
-    const sy = vanishY + sz * (H - vanishY) * 0.3;
-    const smokeSize = s.size * screenScale;
-    const smokeAlpha = s.alpha * (1 - tunnelProgress * 0.5) * Math.min(1, screenScale);
-
-    const smokeGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, smokeSize);
-    smokeGrad.addColorStop(0, `rgba(180,180,190,${smokeAlpha})`);
-    smokeGrad.addColorStop(0.5, `rgba(120,120,130,${smokeAlpha * 0.4})`);
-    smokeGrad.addColorStop(1, 'rgba(80,80,90,0)');
-    ctx.fillStyle = smokeGrad;
-    ctx.fillRect(sx - smokeSize, sy - smokeSize, smokeSize * 2, smokeSize * 2);
-  }
-
-  // === PYROTECHNIC SPARKS ===
-  // Spawn sparks near the tunnel exit
-  if (tunnelProgress > 0.3 && tunnelProgress < 0.85 && Math.random() < 0.4) {
-    const side = Math.random() > 0.5 ? 1 : -1;
-    for (let i = 0; i < 3; i++) {
-      tunnelSparks.push({
-        x: cx + side * W * (wallNarrow - 0.02),
-        y: vanishY + Math.random() * 30,
-        vx: side * -(2 + Math.random() * 4),
-        vy: -(3 + Math.random() * 5),
-        life: 0.4 + Math.random() * 0.6,
-        maxLife: 1,
-        color: Math.random() > 0.3 ? '#FFD700' : (Math.random() > 0.5 ? '#FF6600' : '#FFFFFF'),
-        size: 1 + Math.random() * 2,
-      });
-    }
-  }
-
-  // Draw and update sparks
-  for (let i = tunnelSparks.length - 1; i >= 0; i--) {
-    const sp = tunnelSparks[i];
-    sp.x += sp.vx; sp.y += sp.vy; sp.vy += 0.2; sp.life -= 0.02;
-    if (sp.life <= 0) { tunnelSparks.splice(i, 1); continue; }
-    const alpha = sp.life / sp.maxLife;
-    ctx.fillStyle = sp.color;
-    ctx.globalAlpha = alpha;
-    ctx.fillRect(sp.x, sp.y, sp.size, sp.size);
-    // Spark trail
-    ctx.fillRect(sp.x - sp.vx * 0.5, sp.y - sp.vy * 0.5, sp.size * 0.5, sp.size * 0.5);
-  }
-  ctx.globalAlpha = 1;
-
-  // === TEAMMATE SILHOUETTES ===
-  const time = elapsed * 3;
-  for (const tm of tunnelTeammates) {
-    const z = tm.z - tunnelProgress * 0.2;
-    if (z < 0.05) continue;
-    const scale = 1 / (0.5 + z * 2);
-    const sx = cx + tm.x * W * 0.5 * scale;
-    const sy = vanishY + z * (H - vanishY) * 0.4;
-    const playerH = 60 * scale;
-    const playerW = 25 * scale;
-
-    // Running bob
-    const bob = Math.sin(time * tm.speed + tm.bobPhase) * 3 * scale;
-    // Arm swing
-    const armSwing = Math.sin(time * tm.speed * 2 + tm.armPhase) * 8 * scale;
-
-    // Dark silhouette with Pats navy tint
-    ctx.fillStyle = `rgba(0,20,50,${Math.min(0.9, scale * 2)})`;
-
-    // Body
-    ctx.beginPath();
-    ctx.ellipse(sx, sy + bob - playerH * 0.4, playerW * 0.4, playerH * 0.5, 0, 0, TAU);
-    ctx.fill();
-
-    // Head/helmet
-    ctx.beginPath();
-    ctx.arc(sx, sy + bob - playerH * 0.85, playerW * 0.35, 0, TAU);
-    ctx.fill();
-
-    // Arms (swinging)
-    ctx.strokeStyle = `rgba(0,20,50,${Math.min(0.8, scale * 2)})`;
-    ctx.lineWidth = 3 * scale;
-    ctx.beginPath();
-    ctx.moveTo(sx - playerW * 0.3, sy + bob - playerH * 0.5);
-    ctx.lineTo(sx - playerW * 0.3 + armSwing, sy + bob - playerH * 0.2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(sx + playerW * 0.3, sy + bob - playerH * 0.5);
-    ctx.lineTo(sx + playerW * 0.3 - armSwing, sy + bob - playerH * 0.2);
-    ctx.stroke();
-
-    // Legs (running)
-    const legSwing = Math.sin(time * tm.speed * 2 + tm.armPhase + PI) * 10 * scale;
-    ctx.beginPath();
-    ctx.moveTo(sx, sy + bob);
-    ctx.lineTo(sx + legSwing, sy + bob + playerH * 0.3);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(sx, sy + bob);
-    ctx.lineTo(sx - legSwing, sy + bob + playerH * 0.3);
-    ctx.stroke();
-  }
-
-  // === OVERHEAD LIGHTS (in the tunnel) ===
-  if (tunnelProgress < 0.7) {
-    for (let i = 0; i < 3; i++) {
-      const lz = (i * 0.25 + elapsed * 0.15) % 1.0;
-      if (lz < 0.05) continue;
-      const lScale = 1 / (0.3 + lz * 2);
-      const ly = vanishY + lz * (H - vanishY) * 0.15;
-      const lAlpha = (1 - tunnelProgress) * 0.4 * lScale;
-      const lightR = ctx.createRadialGradient(cx, ly, 0, cx, ly, 30 * lScale);
-      lightR.addColorStop(0, `rgba(255,220,150,${lAlpha})`);
-      lightR.addColorStop(1, 'rgba(255,220,150,0)');
-      ctx.fillStyle = lightR;
-      ctx.fillRect(cx - 40 * lScale, ly - 30 * lScale, 80 * lScale, 60 * lScale);
-    }
-  }
-
-  // === BRIGHT EXIT FLASH (last 15%) ===
-  if (tunnelProgress > 0.85) {
-    const flashAlpha = Math.pow((tunnelProgress - 0.85) / 0.15, 2);
-    ctx.fillStyle = `rgba(255,255,255,${Math.min(1, flashAlpha)})`;
-    ctx.fillRect(0, 0, W, H);
-  }
-
-  // === LENS FLARE when looking at bright exit ===
-  if (tunnelProgress > 0.5 && tunnelProgress < 0.85) {
-    const flareAlpha = (tunnelProgress - 0.5) * 0.6;
-    // Horizontal lens streak
-    ctx.globalAlpha = flareAlpha;
-    const streakGrad = ctx.createLinearGradient(cx - W * 0.4, vanishY, cx + W * 0.4, vanishY);
-    streakGrad.addColorStop(0, 'rgba(255,255,255,0)');
-    streakGrad.addColorStop(0.3, 'rgba(255,240,200,0.15)');
-    streakGrad.addColorStop(0.5, 'rgba(255,255,255,0.3)');
-    streakGrad.addColorStop(0.7, 'rgba(255,240,200,0.15)');
-    streakGrad.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = streakGrad;
-    ctx.fillRect(0, vanishY - 15, W, 30);
-    ctx.globalAlpha = 1;
-  }
-
-  // === POV RUNNING MOTION (floor lines rushing toward you) ===
-  ctx.strokeStyle = 'rgba(50,50,50,0.15)';
-  ctx.lineWidth = 1;
   for (let i = 0; i < 6; i++) {
-    const lineZ = ((i * 0.15 + elapsed * tunnelSpeed * 0.3) % 0.9);
-    const lineY = vanishY + lineZ * (H - vanishY) * 0.6 + H * 0.15;
-    const spread = lineZ * 0.5;
-    const lx = W * (wallNarrow - spread * wallNarrow);
-    const rx = W * (1 - wallNarrow + spread * wallNarrow);
-    if (lineY < H) {
-      ctx.beginPath();
-      ctx.moveTo(lx, lineY);
-      ctx.lineTo(rx, lineY);
-      ctx.stroke();
-    }
+    const d = (i + 1) / 7;
+    const ringW = tunnelWidth * d * 0.5, ringH = tunnelHeight * d * 0.5;
+    const alpha = (1 - d) * 0.3 * (1 - tunnelLight);
+    tunnelCtx.strokeStyle = `rgba(80,80,100,${alpha})`;
+    tunnelCtx.lineWidth = 3;
+    tunnelCtx.beginPath();
+    tunnelCtx.ellipse(cx, cy * 0.85, ringW, ringH, 0, 0, TAU);
+    tunnelCtx.stroke();
   }
 
-  ctx.restore(); // camera shake
+  if (tunnelLight > 0.5) {
+    const fieldAlpha = (tunnelLight - 0.5) * 2;
+    const fGrad = tunnelCtx.createRadialGradient(cx, cy, 0, cx, cy, outerRad * 0.6);
+    fGrad.addColorStop(0, `rgba(46,125,50,${fieldAlpha * 0.4})`);
+    fGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    tunnelCtx.fillStyle = fGrad;
+    tunnelCtx.fillRect(0, 0, W, H);
+  }
+
+  if (tunnelLight > 0.8) {
+    tunnelCtx.fillStyle = `rgba(255,255,255,${Math.min(1, (tunnelLight - 0.8) * 5)})`;
+    tunnelCtx.fillRect(0, 0, W, H);
+  }
 }
 
 function endTunnel() {
   if (tunnelAborted) return;
   tunnelAborted = true;
-  playSound('crowd_roar');
   const flash = document.createElement('div');
   flash.className = 'screen-flash';
   document.body.appendChild(flash);
@@ -2699,6 +2416,7 @@ function endTunnel() {
 function skipTunnel() {
   if (tunnelAborted) return;
   tunnelAborted = true;
+  // Cancel all pending tunnel timeouts
   for (const t of tunnelTimeouts) clearTimeout(t);
   tunnelTimeouts = [];
   tunnelOverlay.style.display = 'none';

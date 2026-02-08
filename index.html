@@ -2471,6 +2471,7 @@ function resolveSeaDrive(scored, isTD) {
   // Transition back to Patriots offense
   gameTimeout(() => {
     if (gameState === 'ENDING' || gameState === 'GAME_OVER') return;
+    gameState = 'INTRO'; // transition visual back to Patriots formation
 
     if (driveCount >= totalDrivesPerHalf * 2) {
       gameState = 'ENDING';
@@ -2774,7 +2775,7 @@ function saveState() {
     const state = {
       version: 2,
       currentGame, patsScore, seaScore, down, yardsToGo, ballYard,
-      quarter, gameClock, driveCount, playsThisDrive, isPatsOffense,
+      quarter, gameClock, driveCount, playsThisDrive, isPatsOffense: true,
       taughtMoments: [...taughtMoments],
       gameState: gameState === 'GAME_OVER' ? 'GAME_OVER' : 'PLAY_CALL'
     };

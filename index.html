@@ -1732,7 +1732,7 @@ function startPlayAnimation(play) {
   }
 
   playSound('whistle');
-  setTimeout(() => playSound('hit'), animDuration - 400);
+  gameTimeout(() => playSound('hit'), animDuration - 400);
 }
 
 function drawPlayAnimation(play) {
@@ -2326,7 +2326,7 @@ $('btn-next').addEventListener('click', () => {
   startNewGame();
 });
 
-$('btn-replay').addEventListener('click', () => { startNewGame(); });
+$('btn-replay').addEventListener('click', () => { taughtMoments.clear(); startNewGame(); });
 
 // Skip to next game
 $('skip-game').addEventListener('click', (e) => {
@@ -2348,12 +2348,19 @@ $('skip-game').addEventListener('touchend', (e) => {
 function startNewGame() {
   gameOverEl.style.display = 'none';
   clearGameTimeouts();
+  // Hide any stale moment card or dim overlay from previous game
+  momentCard.classList.remove('visible');
+  dimOverlay.classList.remove('visible');
+  hidePlayCards();
+  snapPrompt.classList.remove('visible');
   patsScore = 0; seaScore = 0;
   down = 1; yardsToGo = 10;
   ballYard = 25; quarter = 1; gameClock = 900;
   driveCount = 0; playsThisDrive = 0;
   isPatsOffense = true; particles = [];
   momentQueue = []; pendingResolve = null;
+  prevStateBeforeMoment = null;
+  momentDismissing = false;
   stuckTimer = 0;
   clearCommentary();
   showMatchupCard();

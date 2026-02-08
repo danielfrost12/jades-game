@@ -35,6 +35,7 @@
 
 html, body {
   width: 100%; height: 100%;
+  height: 100dvh;
   overflow: hidden;
   background: #000;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
@@ -43,6 +44,8 @@ html, body {
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
 }
 
 canvas#game {
@@ -65,14 +68,13 @@ canvas#game {
 /* ======= COMMENTARY BAR ======= */
 #commentary-bar {
   position: absolute;
-  top: env(safe-area-inset-top, 0px);
-  left: 0; right: 0;
-  padding: 8px 16px;
+  top: 0; left: 0; right: 0;
+  padding: calc(env(safe-area-inset-top, 0px) + 6px) 16px 12px;
   min-height: 56px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 80%, transparent 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0.4) 85%, transparent 100%);
   opacity: 0;
   transform: translateY(-20px);
   transition: opacity 0.5s ease, transform 0.5s ease;
@@ -83,25 +85,25 @@ canvas#game {
   transform: translateY(0);
 }
 #commentary-bar .play-by-play {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
-  line-height: 1.3;
+  line-height: 1.35;
 }
 #commentary-bar .color-commentary {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
   color: var(--gold);
-  line-height: 1.3;
+  line-height: 1.35;
   font-style: italic;
 }
 #commentary-bar .espn-tag {
   display: inline-block;
   background: var(--espn-red);
   color: white;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 800;
-  padding: 2px 5px;
+  padding: 2px 6px;
   border-radius: 2px;
   margin-right: 6px;
   letter-spacing: 0.5px;
@@ -112,8 +114,8 @@ canvas#game {
 #scoreboard {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  padding: 0 12px calc(env(safe-area-inset-bottom, 8px) + 8px) 12px;
-  background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 70%, transparent 100%);
+  padding: 8px 16px calc(env(safe-area-inset-bottom, 34px) + 4px) 16px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.85) 60%, rgba(0,0,0,0.4) 85%, transparent 100%);
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.5s ease, transform 0.5s ease;
@@ -135,26 +137,26 @@ canvas#game {
   gap: 8px;
 }
 .team-logo {
-  width: 28px; height: 28px;
+  width: 32px; height: 32px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-weight: 900;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: -0.5px;
 }
 .team-logo.pats { background: var(--pats-navy); border: 2px solid var(--pats-red); }
 .team-logo.sea { background: var(--sea-green); border: 2px solid var(--sea-navy); }
 .team-name {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
 .team-pts {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  min-width: 36px;
+  min-width: 40px;
   text-align: right;
 }
 .possession-dot {
@@ -199,10 +201,10 @@ canvas#game {
 /* ======= PLAY CARDS ======= */
 #play-cards {
   position: absolute;
-  bottom: 180px;
-  left: 12px; right: 12px;
+  bottom: calc(env(safe-area-inset-bottom, 34px) + 165px);
+  left: 16px; right: 16px;
   display: flex;
-  gap: 8px;
+  gap: 10px;
   justify-content: center;
   opacity: 0;
   transform: translateY(30px);
@@ -217,37 +219,38 @@ canvas#game {
 
 .play-card {
   flex: 1;
-  max-width: 120px;
+  max-width: 115px;
+  min-height: 110px;
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 16px;
-  padding: 14px 10px;
+  border-radius: 18px;
+  padding: 16px 10px 14px;
   text-align: center;
   cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
 .play-card:active {
-  transform: scale(0.95);
-  background: rgba(255,255,255,0.15);
-  border-color: rgba(255,255,255,0.3);
+  transform: scale(0.93);
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.35);
 }
 .play-card .card-icon {
-  font-size: 28px;
-  margin-bottom: 6px;
+  font-size: 30px;
+  margin-bottom: 8px;
   display: block;
 }
 .play-card .card-name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 .play-card .card-desc {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-secondary);
   line-height: 1.3;
 }
@@ -257,19 +260,20 @@ canvas#game {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%) scale(0.9);
-  width: calc(100% - 48px);
-  max-width: 340px;
-  background: rgba(20,20,20,0.95);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 20px;
-  padding: 24px;
+  width: calc(100% - 40px);
+  max-width: 353px;
+  background: rgba(18,18,18,0.96);
+  backdrop-filter: blur(40px) saturate(1.5);
+  -webkit-backdrop-filter: blur(40px) saturate(1.5);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 22px;
+  padding: 28px 24px;
   text-align: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity 0.35s ease, transform 0.35s ease;
   z-index: 20;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
 }
 #moment-card.visible {
   opacity: 1;
@@ -277,22 +281,22 @@ canvas#game {
   pointer-events: auto;
 }
 #moment-card .moment-emoji {
-  font-size: 48px;
-  margin-bottom: 12px;
+  font-size: 52px;
+  margin-bottom: 14px;
   display: block;
 }
 #moment-card .moment-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 #moment-card .moment-body {
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.55;
   color: var(--text-secondary);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 #moment-card .moment-body strong {
   color: var(--gold);
@@ -507,7 +511,7 @@ canvas#game {
 /* ======= SNAP PROMPT ======= */
 #snap-prompt {
   position: absolute;
-  bottom: 260px;
+  bottom: calc(env(safe-area-inset-bottom, 34px) + 290px);
   left: 0; right: 0;
   text-align: center;
   opacity: 0;
@@ -516,10 +520,11 @@ canvas#game {
 }
 #snap-prompt.visible { opacity: 1; pointer-events: auto; }
 #snap-prompt .snap-text {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 3px;
+  letter-spacing: 4px;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.6);
   animation: pulse 1.5s ease-in-out infinite;
 }
 
@@ -761,19 +766,15 @@ canvas#game {
 
 <script>
 // ============================================================
-// JADE'S GAME — Full Implementation
+// JADE'S GAME v3 — Complete Rewrite
+// All bugs fixed, real ESPN commentary, proper state machine
 // ============================================================
 
 (function() {
 'use strict';
 
-// ---- CONSTANTS ----
 const PI = Math.PI, TAU = PI * 2;
-const FIELD_YARDS = 100;
-const YARD_PX = 12; // pixels per yard in world space
-const ENDZONE_YARDS = 10;
 
-// Team colors
 const PATS = { primary: '#002244', secondary: '#C60C30', accent: '#B0B7BC', name: 'Patriots' };
 const SEA = { primary: '#002244', secondary: '#69BE28', accent: '#A5ACAF', name: 'Seahawks' };
 
@@ -784,7 +785,6 @@ const ctx = canvas.getContext('2d');
 const tunnelCanvas = $('tunnel-canvas');
 const tunnelCtx = tunnelCanvas.getContext('2d');
 
-// UI elements
 const titleScreen = $('title-screen');
 const tunnelOverlay = $('tunnel-overlay');
 const matchupCard = $('matchup-card');
@@ -798,44 +798,58 @@ const momentCard = $('moment-card');
 const dimOverlay = $('dim-overlay');
 const gameOverEl = $('game-over');
 
+// ---- HELPERS ----
+function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
 // ---- GAME STATE ----
 let W, H, dpr;
-let gameState = 'TITLE'; // TITLE, TUNNEL, MATCHUP, PLAY_CALL, SNAP_WAIT, PLAY_ACTIVE, PLAY_RESULT, MOMENT, SCORE_ANIM, GAME_OVER
-let currentGame = 0; // 0-4 (5 games)
+let gameState = 'TITLE';
+let prevStateBeforeMoment = null; // tracks what to return to after MOMENT
+let currentGame = 0;
 let patsScore = 0, seaScore = 0;
 let down = 1, yardsToGo = 10;
-let ballYard = 25; // field position (0 = own endzone, 100 = opponent endzone)
-let quarter = 1, gameClock = 900; // seconds
+let ballYard = 25;
+let quarter = 1, gameClock = 900;
 let isPatsOffense = true;
 let driveCount = 0;
 let playsThisDrive = 0;
 let selectedPlay = null;
-let playAnimTimer = 0;
 let playResult = null;
 let particles = [];
 let cameraShake = 0;
-let crowdVolume = 0.3;
-let fieldScroll = 0; // for parallax
+let cameraShakeActive = false; // track ctx.save for shake
 let taughtMoments = new Set();
 let momentQueue = [];
 let commentaryQueue = [];
 let currentCommentary = null;
 let commentaryTimer = 0;
-let totalDrivesPerHalf = 4;
+let totalDrivesPerHalf = 5;
 let lastFrameTime = 0;
+let pendingResolve = null; // deferred play resolution callback
 
-// Player positions for rendering
 let offensePlayers = [];
 let defensePlayers = [];
-let ballPos = { x: 0, y: 0 };
-let receiverTargets = []; // for pass plays - screen positions
-let playAnimPhase = 0; // 0: pre-snap lineup, 1: snap, 2: action, 3: result
-let playYardsGained = 0;
+let receiverTargets = [];
 let throwTarget = null;
+
+// Animation state
+let animStartTime = 0;
+let animDuration = 2500;
+let animResult = '';
+let animYards = 0;
+
+// Tunnel
+let tunnelPhase = 0;
+let tunnelStartTime = 0;
+let tunnelLight = 0;
+let tunnelTimeouts = []; // track all tunnel timeouts for cleanup
+let tunnelAborted = false;
 
 // Audio
 let audioCtx = null;
 let audioUnlocked = false;
+let crowdAmbient = null;
 
 // ---- GAME DEFINITIONS ----
 const GAME_DEFS = [
@@ -847,11 +861,7 @@ const GAME_DEFS = [
       { id: 'run_mid', name: 'Run Middle', icon: '⬆️', desc: 'Hand off, up the gut', type: 'run' },
       { id: 'run_right', name: 'Run Right', icon: '👉', desc: 'Hand off, run right', type: 'run' },
     ],
-    defDifficulty: 0.2,
-    introCommentary: [
-      { pbp: "Welcome to your first drive!", color: "You're the Patriots offense. Your job? Move the ball down the field and reach the end zone!" },
-      { pbp: "Pick a play to get started.", color: "Tap a card below to call your first play. Let's run the ball!" }
-    ]
+    defDifficulty: 0.2
   },
   {
     name: 'Air It Out',
@@ -861,10 +871,7 @@ const GAME_DEFS = [
       { id: 'short_pass', name: 'Short Pass', icon: '📡', desc: 'Quick throw, safe', type: 'pass', range: 'short' },
       { id: 'deep_pass', name: 'Deep Pass', icon: '🚀', desc: 'Throw it long!', type: 'pass', range: 'deep' },
     ],
-    defDifficulty: 0.35,
-    introCommentary: [
-      { pbp: "Time to open up the playbook!", color: "Now you can throw the ball! Tap a receiver to throw to them." }
-    ]
+    defDifficulty: 0.35
   },
   {
     name: 'The Full Picture',
@@ -874,10 +881,7 @@ const GAME_DEFS = [
       { id: 'short_pass', name: 'Short Pass', icon: '📡', desc: 'Quick throw', type: 'pass', range: 'short' },
       { id: 'deep_pass', name: 'Deep Pass', icon: '🚀', desc: 'Go long!', type: 'pass', range: 'deep' },
     ],
-    defDifficulty: 0.45,
-    introCommentary: [
-      { pbp: "Game 3 — things are getting real.", color: "Watch out for penalties and turnovers. And if you're close enough, try a field goal!" }
-    ]
+    defDifficulty: 0.45
   },
   {
     name: 'Clock Management',
@@ -887,10 +891,7 @@ const GAME_DEFS = [
       { id: 'short_pass', name: 'Short Pass', icon: '📡', desc: 'Stops clock if incomplete', type: 'pass', range: 'short' },
       { id: 'deep_pass', name: 'Deep Pass', icon: '🚀', desc: 'Big risk, big reward', type: 'pass', range: 'deep' },
     ],
-    defDifficulty: 0.55,
-    introCommentary: [
-      { pbp: "The clock matters now.", color: "Running plays eat clock. Incomplete passes stop it. Manage your time wisely!" }
-    ]
+    defDifficulty: 0.55
   },
   {
     name: 'The Super Bowl',
@@ -900,86 +901,147 @@ const GAME_DEFS = [
       { id: 'short_pass', name: 'Short Pass', icon: '📡', desc: 'Safe & quick', type: 'pass', range: 'short' },
       { id: 'deep_pass', name: 'Deep Pass', icon: '🚀', desc: 'Bomb it!', type: 'pass', range: 'deep' },
     ],
-    defDifficulty: 0.6,
-    introCommentary: [
-      { pbp: "THIS IS THE SUPER BOWL!", color: "Everything you've learned comes together now. Win this, and you've mastered football!" }
-    ]
+    defDifficulty: 0.6
   }
 ];
 
 // ---- TEACHING MOMENTS ----
 const MOMENTS = {
   field: { emoji: '🏟️', title: 'The Field', body: 'A football field is <strong>100 yards</strong> long. Each team defends one end zone. Your goal is to move the ball to the <strong>opponent\'s end zone</strong> to score.' },
-  offense: { emoji: '💪', title: 'Offense & Defense', body: 'You\'re the <strong>offense</strong> — you have the ball. The other team is the <strong>defense</strong> — they try to stop you. Teams switch roles when possession changes.' },
-  running: { emoji: '🏃', title: 'Running the Ball', body: 'The QB hands the ball to a <strong>running back (RB)</strong> who runs with it. The offensive line blocks defenders to create space.' },
-  touchdown: { emoji: '🎉', title: 'TOUCHDOWN!', body: 'You scored! A touchdown is worth <strong>6 points</strong>. After a TD, you kick an extra point for <strong>1 more point</strong> (7 total). That\'s the most common way to score!' },
-  downs: { emoji: '4️⃣', title: 'Downs', body: 'You get <strong>4 tries (downs)</strong> to move the ball <strong>10 yards</strong>. If you make it 10 yards, you get a fresh set of 4 downs. If you fail, the other team gets the ball.' },
+  offense: { emoji: '💪', title: 'Offense & Defense', body: 'You\'re the <strong>offense</strong> — you have the ball. The other team is the <strong>defense</strong> — they try to stop you.' },
+  running: { emoji: '🏃', title: 'Running the Ball', body: 'The QB hands the ball to a <strong>running back (RB)</strong> who runs with it. The offensive line blocks defenders to make room.' },
+  touchdown: { emoji: '🎉', title: 'TOUCHDOWN!', body: 'You scored! A touchdown is worth <strong>6 points</strong>. Then you kick an extra point for <strong>1 more</strong> (7 total)!' },
+  downs: { emoji: '4️⃣', title: 'Downs', body: 'You get <strong>4 tries (downs)</strong> to move <strong>10 yards</strong>. Make it and you get 4 fresh tries. Fail and the other team gets the ball.' },
   first_down: { emoji: '🔥', title: 'First Down!', body: 'You moved 10+ yards! That gives you a <strong>fresh set of 4 downs</strong>. "1st & 10" means 1st down, 10 yards to go.' },
-  passing: { emoji: '🎯', title: 'Passing', body: 'The <strong>quarterback (QB)</strong> throws the ball to a <strong>receiver</strong>. Tap the receiver you want to throw to! If nobody catches it, it\'s called <strong>incomplete</strong>.' },
-  incomplete: { emoji: '❌', title: 'Incomplete Pass', body: 'The pass wasn\'t caught! That\'s called <strong>incomplete</strong>. The good news? The clock stops on an incomplete pass. You keep your field position.' },
-  receivers: { emoji: '🏃‍♂️', title: 'Receivers', body: 'Those players running downfield are <strong>wide receivers</strong>. They run planned routes to get open. Tap the one who looks most open!' },
-  field_goal: { emoji: '🥅', title: 'Field Goal', body: 'Too far for a TD? Kick a <strong>field goal</strong> for <strong>3 points</strong>! The closer you are, the easier the kick. Usually attempted within 40 yards of the end zone.' },
-  interception: { emoji: '😱', title: 'Interception!', body: 'The defense caught YOUR pass! That\'s called an <strong>interception</strong> — they take the ball. Deep passes are riskier. Choose wisely!' },
-  penalty_offsides: { emoji: '🚩', title: 'Penalty: Offsides', body: 'The defense jumped before the ball was snapped! That\'s <strong>offsides</strong> — a <strong>5-yard penalty</strong>. Free yards for us!' },
-  penalty_holding: { emoji: '🚩', title: 'Penalty: Holding', body: 'A defender illegally grabbed our player. That\'s <strong>holding</strong> — results in a penalty and we get extra yards!' },
-  clock: { emoji: '⏱️', title: 'The Game Clock', body: 'Each quarter is 15 minutes. <strong>Running plays</strong> keep the clock running. <strong>Incomplete passes</strong> and going <strong>out of bounds</strong> stop the clock.' },
-  two_minute: { emoji: '🔥', title: 'Two-Minute Warning!', body: 'Under 2 minutes in the half! This is when games get intense. Every second counts. Use pass plays to stop the clock if you need to score fast.' },
-  two_point: { emoji: '2️⃣', title: 'Two-Point Conversion', body: 'Instead of kicking the extra point (1 pt), you can try to score from the 2-yard line for <strong>2 points</strong>. Risky but great when you need to catch up!' },
+  passing: { emoji: '🎯', title: 'Passing', body: 'The <strong>quarterback (QB)</strong> throws to a <strong>receiver</strong>. Tap the receiver you want to throw to! If nobody catches it, it\'s <strong>incomplete</strong>.' },
+  incomplete: { emoji: '❌', title: 'Incomplete Pass', body: 'The pass wasn\'t caught — that\'s <strong>incomplete</strong>. The clock stops, and you keep your field position.' },
+  receivers: { emoji: '🏃‍♂️', title: 'Receivers', body: 'Those players running downfield are <strong>wide receivers</strong>. They run planned routes. Tap the one who looks most open!' },
+  field_goal: { emoji: '🥅', title: 'Field Goal', body: 'Too far for a TD? Kick a <strong>field goal</strong> for <strong>3 points</strong>! The closer you are, the easier the kick.' },
+  interception: { emoji: '😱', title: 'Interception!', body: 'The defense caught YOUR pass! That\'s an <strong>interception</strong> — they take the ball. Deep passes are riskier!' },
+  penalty_offsides: { emoji: '🚩', title: 'Penalty: Offsides', body: 'The defense jumped before the snap! That\'s <strong>offsides</strong> — free <strong>5 yards</strong> for us!' },
+  penalty_holding: { emoji: '🚩', title: 'Penalty: Holding', body: 'A defender illegally grabbed our player. That\'s <strong>holding</strong> — penalty yards and automatic first down!' },
+  clock: { emoji: '⏱️', title: 'The Game Clock', body: '<strong>Running plays</strong> keep the clock running. <strong>Incomplete passes</strong> and going <strong>out of bounds</strong> stop it.' },
+  two_minute: { emoji: '🔥', title: 'Two-Minute Warning!', body: 'Under 2 minutes! Every second counts. Use pass plays to stop the clock if you need to score fast.' },
+  two_point: { emoji: '2️⃣', title: 'Two-Point Conversion', body: 'Instead of kicking for 1 point, try scoring from the 2-yard line for <strong>2 points</strong>. Risky but great for catching up!' },
 };
 
-// ---- COMMENTARY LINES ----
-function getPlayCommentary(play, result, yards) {
-  const lines = [];
-  if (play.type === 'run') {
-    if (yards > 15) {
-      lines.push({ pbp: `Handoff — and he BREAKS FREE! ${yards} yard gain!`, color: "What a run! The offensive line created a massive hole and the running back hit it perfectly." });
-    } else if (yards > 5) {
-      lines.push({ pbp: `Good run up the middle for ${yards} yards.`, color: "Solid play. The running back found a gap and picked up good yardage." });
-    } else if (yards > 0) {
-      lines.push({ pbp: `Run play, stuffed after ${yards} yards.`, color: "The defense read that one well. Sometimes you just take what you can get." });
-    } else {
-      lines.push({ pbp: "Tackled behind the line of scrimmage!", color: "That's a loss! The defense broke through and stopped it cold." });
-    }
-  } else if (play.type === 'pass') {
-    if (result === 'complete') {
-      if (yards > 25) {
-        lines.push({ pbp: `WHAT A THROW! Complete for ${yards} yards!`, color: "A BOMB! The quarterback put it right on the money and the receiver hauled it in!" });
-      } else if (yards > 10) {
-        lines.push({ pbp: `Pass complete for ${yards} yards!`, color: "Nice connection! That's what the passing game is all about." });
-      } else {
-        lines.push({ pbp: `Short pass, ${yards} yards gained.`, color: "A safe, smart throw. Sometimes the short game is all you need." });
-      }
-    } else if (result === 'incomplete') {
-      lines.push({ pbp: "Pass falls incomplete.", color: "Nobody came down with it. The clock stops on an incomplete pass — remember that!" });
-    } else if (result === 'interception') {
-      lines.push({ pbp: "INTERCEPTED! The defense picks it off!", color: "Oh no! The defender read the quarterback's eyes and jumped the route." });
-    }
-  }
-  if (result === 'touchdown') {
-    lines.push({ pbp: "TOUCHDOWN PATRIOTS!! 🎉", color: "Six points! Now we kick the extra point to make it seven!" });
-  }
-  return lines;
+// ---- ESPN COMMENTARY (Human-like announcer lines) ----
+const COMMENTARY = {
+  RUN_BIG: [
+    { pbp: "Handoff — AND HE'S GONE! {yards} yards, just like that!", color: "Oh my goodness, he hit that hole and nobody could catch him! That's what speed looks like!" },
+    { pbp: "He breaks one tackle... two tackles... {yards} yard gain!", color: "Are you kidding me?! That man was NOT going down. What a run!" },
+    { pbp: "WHAT A RUN! {yards} yards and he's still going!", color: "That's the kind of play that gets the whole stadium on their feet!" },
+  ],
+  RUN_GOOD: [
+    { pbp: "Nice run up the middle — {yards} yards.", color: "Good vision by the running back. He found the hole and hit it hard." },
+    { pbp: "He cuts left, picks up {yards}. First down territory.", color: "Solid, physical football right there. That's how you move the chains." },
+    { pbp: "Power run for {yards}. The line did their job.", color: "When the big guys up front block like that, good things happen." },
+  ],
+  RUN_SHORT: [
+    { pbp: "Run play, squeezed for {yards}.", color: "Tough sledding. The defense was ready for that one." },
+    { pbp: "Not much room — {yards} yards is all he gets.", color: "Sometimes you just take what the defense gives you. Gotta move on." },
+    { pbp: "Short gain, {yards} yards.", color: "The defense plugged the gaps. Might want to try mixing it up." },
+  ],
+  RUN_LOSS: [
+    { pbp: "He's dropped behind the line! Loss of yardage!", color: "The defense blew that up. They read it perfectly." },
+    { pbp: "Stuffed in the backfield! Nowhere to go.", color: "Oof. That's exactly what you don't want to see. The defense won that battle." },
+  ],
+  PASS_DEEP_COMPLETE: [
+    { pbp: "Launches it deep... AND IT'S CAUGHT! {yards} YARDS!", color: "WHAT. A. THROW. Right on the money, and the receiver went up and got it!" },
+    { pbp: "He airs it out... BEAUTIFUL catch for {yards}!", color: "That pass was a thing of beauty. Dropped it right in the bucket!" },
+    { pbp: "BOMB! {yards} yards through the air!", color: "That's what we call a dime! Perfect spiral, perfect placement. Incredible." },
+  ],
+  PASS_GOOD: [
+    { pbp: "Pass complete — {yards} yards, right on the numbers.", color: "That's a veteran throw right there. Knew exactly where to put it." },
+    { pbp: "Fires to the right, caught for {yards}!", color: "Quick release, accurate throw. That's efficient offense." },
+    { pbp: "Finds his man for a {yards}-yard pickup.", color: "Smart play. Take what the defense gives you and keep moving." },
+  ],
+  PASS_SHORT: [
+    { pbp: "Short pass, {yards} yards gained.", color: "Not flashy, but it gets the job done. Every yard counts." },
+    { pbp: "Quick throw, caught for {yards}.", color: "A safe, smart throw. Sometimes the short game is all you need." },
+  ],
+  INCOMPLETE: [
+    { pbp: "Pass falls incomplete.", color: "Nobody came down with it. But hey — incomplete means the clock stops. That can matter!" },
+    { pbp: "Throws and... no! It hits the turf.", color: "Just a bit off. The window was tight and the QB couldn't fit it in." },
+    { pbp: "Looking... throwing... incomplete.", color: "You miss 100% of the shots you don't take, but you also miss some you do. Part of the game!" },
+  ],
+  INTERCEPTION: [
+    { pbp: "INTERCEPTED! Oh no!", color: "The defender jumped that route like he knew it was coming. Risky pass, and it cost them." },
+    { pbp: "Picked off! The defense reads it perfectly!", color: "That's the danger of throwing deep. High reward, but the risk is real." },
+  ],
+  TD: [
+    { pbp: "TOUCHDOWN!! PATRIOTS!!", color: "Six points on the board! And after the extra point kick, that's SEVEN! That's the biggest play in football!" },
+    { pbp: "HE'S IN! TOUCHDOWN NEW ENGLAND!!", color: "WHAT A PLAY! Into the end zone for 6! Now we kick the extra point to make it 7!" },
+    { pbp: "ALL THE WAY! TOUCHDOWN!!", color: "The crowd is going CRAZY! That's what it's all about — get the ball in that end zone!" },
+  ],
+  FIRST_DOWN: [
+    { pbp: "That's a FIRST DOWN!", color: "Fresh set of downs! Four more chances to go another 10 yards. Keep that drive alive!" },
+    { pbp: "First down Patriots!", color: "Moving the chains! That's how you march down the field — 10 yards at a time." },
+  ],
+  TURNOVER_ON_DOWNS: [
+    { pbp: "Turnover on downs. Seahawks take over.", color: "Couldn't convert. Four tries and they couldn't get 10 yards. Now it's Seattle's ball." },
+  ],
+  SEA_TD: [
+    { pbp: "Seahawks march right down and SCORE.", color: "Touchdown Seattle. The defense needs to tighten up." },
+    { pbp: "Russell Wilson finds his man — Seahawks TOUCHDOWN.", color: "Seven points for Seattle. This game just got more interesting." },
+  ],
+  SEA_FG: [
+    { pbp: "Seahawks settle for a field goal. 3 points.", color: "The defense bent but didn't break. Holding them to 3 is a win." },
+  ],
+  SEA_PUNT: [
+    { pbp: "Seahawks go 3 and out!", color: "Great stop by the defense! We get the ball right back!" },
+    { pbp: "Defense holds! Patriots ball.", color: "That's what I like to see — the defense shut them DOWN." },
+  ],
+  PENALTY_OFFSIDES: [
+    { pbp: "Flag on the play! Offsides, defense!", color: "They jumped early! That's a free 5 yards for us. Easy money!" },
+  ],
+  PENALTY_HOLDING: [
+    { pbp: "Flag! Holding on the defense.", color: "Can't do that! 10-yard penalty AND an automatic first down. Big mistake by the defense." },
+  ],
+  FG_ATTEMPT: [
+    { pbp: "Field goal unit comes out... {distance} yarder...", color: "" },
+  ],
+  FG_GOOD: [
+    { pbp: "It's GOOD! Three points!", color: "Right through the uprights! Not as much as a touchdown, but 3 points is 3 points!" },
+  ],
+  FG_MISS: [
+    { pbp: "No good! Wide right!", color: "Just missed it. That's tough. They'll wish they had those 3 points later." },
+  ],
+};
+
+function fillTemplate(str, vars) {
+  return str.replace(/\{(\w+)\}/g, (_, key) => vars[key] !== undefined ? vars[key] : '');
 }
 
-function getDownCommentary(d, ytg, yard) {
-  const ordinals = ['', '1st', '2nd', '3rd', '4th'];
-  if (d <= 4) {
-    if (d === 3 && ytg > 7) {
-      return { pbp: `${ordinals[d]} and ${ytg}. This is a big play.`, color: "3rd and long — the defense knows a pass is coming. Pick your moment." };
-    }
-    if (d === 4) {
-      if (yard >= 60) {
-        return { pbp: `4th down. Field goal range!`, color: "You can try for a field goal here — 3 points. Or go for it if you're feeling bold!" };
-      }
-      return { pbp: `4th down — decision time.`, color: "You can go for it (risky!) or punt the ball away. Let's see what you choose." };
-    }
+function getPlayCommentary(play, result, yards) {
+  const vars = { yards: Math.abs(yards) };
+  let pool;
+
+  if (result === 'touchdown') {
+    pool = COMMENTARY.TD;
+  } else if (result === 'interception') {
+    pool = COMMENTARY.INTERCEPTION;
+  } else if (result === 'incomplete') {
+    pool = COMMENTARY.INCOMPLETE;
+  } else if (play.type === 'run') {
+    if (yards > 15) pool = COMMENTARY.RUN_BIG;
+    else if (yards > 5) pool = COMMENTARY.RUN_GOOD;
+    else if (yards > 0) pool = COMMENTARY.RUN_SHORT;
+    else pool = COMMENTARY.RUN_LOSS;
+  } else if (play.type === 'pass') {
+    if (yards > 25) pool = COMMENTARY.PASS_DEEP_COMPLETE;
+    else if (yards > 10) pool = COMMENTARY.PASS_GOOD;
+    else pool = COMMENTARY.PASS_SHORT;
   }
-  return null;
+
+  if (!pool) return [];
+  const line = pickRandom(pool);
+  return [{ pbp: fillTemplate(line.pbp, vars), color: fillTemplate(line.color, vars) }];
 }
 
 // ---- RESIZE ----
 function resize() {
-  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  dpr = Math.min(window.devicePixelRatio || 1, 3);
   W = window.innerWidth;
   H = window.innerHeight;
   canvas.width = W * dpr;
@@ -999,13 +1061,20 @@ resize();
 
 // ---- AUDIO ENGINE ----
 function initAudio() {
-  if (audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  audioUnlocked = true;
+  if (audioCtx) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return;
+  }
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    audioUnlocked = true;
+  } catch(e) { /* no audio support */ }
 }
 
 function playSound(type) {
   if (!audioCtx || !audioUnlocked) return;
+  if (audioCtx.state === 'suspended') audioCtx.resume();
   try {
     const now = audioCtx.currentTime;
     if (type === 'whistle') {
@@ -1020,12 +1089,10 @@ function playSound(type) {
       osc.start(now);
       osc.stop(now + 0.4);
     } else if (type === 'hit') {
-      const bufferSize = audioCtx.sampleRate * 0.15;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const bufSize = audioCtx.sampleRate * 0.15;
+      const buffer = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.1));
-      }
+      for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.1));
       const source = audioCtx.createBufferSource();
       source.buffer = buffer;
       const filter = audioCtx.createBiquadFilter();
@@ -1049,12 +1116,10 @@ function playSound(type) {
         osc.stop(now + i * 0.12 + 0.5);
       });
     } else if (type === 'crowd_roar') {
-      const bufferSize = audioCtx.sampleRate * 1.5;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const bufSize = audioCtx.sampleRate * 1.5;
+      const buffer = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1);
-      }
+      for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1);
       const source = audioCtx.createBufferSource();
       source.buffer = buffer;
       const filter = audioCtx.createBiquadFilter();
@@ -1080,13 +1145,10 @@ function playSound(type) {
       osc.start(now);
       osc.stop(now + 0.1);
     } else if (type === 'crowd_ambient') {
-      // Continuous crowd noise — create and return node for control
-      const bufferSize = audioCtx.sampleRate * 3;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const bufSize = audioCtx.sampleRate * 3;
+      const buffer = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1);
-      }
+      for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1);
       const source = audioCtx.createBufferSource();
       source.buffer = buffer;
       source.loop = true;
@@ -1100,18 +1162,15 @@ function playSound(type) {
       source.start();
       return { source, gain };
     }
-  } catch(e) { /* audio error, ignore */ }
+  } catch(e) { /* audio error */ }
 }
 
-let crowdAmbient = null;
 function startCrowdAmbient() {
-  if (!crowdAmbient && audioCtx) {
-    crowdAmbient = playSound('crowd_ambient');
-  }
+  if (!crowdAmbient && audioCtx) crowdAmbient = playSound('crowd_ambient');
 }
 function setCrowdVolume(v) {
   if (crowdAmbient && crowdAmbient.gain) {
-    crowdAmbient.gain.gain.linearRampToValueAtTime(v * 0.12, audioCtx.currentTime + 0.3);
+    try { crowdAmbient.gain.gain.linearRampToValueAtTime(v * 0.12, audioCtx.currentTime + 0.3); } catch(e) {}
   }
 }
 
@@ -1121,14 +1180,9 @@ function spawnParticles(x, y, count, color, speed, life) {
     const angle = Math.random() * TAU;
     const spd = speed * (0.5 + Math.random() * 0.5);
     particles.push({
-      x, y,
-      vx: Math.cos(angle) * spd,
-      vy: Math.sin(angle) * spd - (speed * 0.5),
-      life: life * (0.5 + Math.random() * 0.5),
-      maxLife: life,
-      color,
-      size: 2 + Math.random() * 4,
-      gravity: 0.15
+      x, y, vx: Math.cos(angle) * spd, vy: Math.sin(angle) * spd - speed * 0.5,
+      life: life * (0.5 + Math.random() * 0.5), maxLife: life,
+      color, size: 2 + Math.random() * 4, gravity: 0.15
     });
   }
 }
@@ -1139,16 +1193,10 @@ function spawnConfetti(x, y) {
     const angle = Math.random() * TAU;
     const spd = 2 + Math.random() * 6;
     particles.push({
-      x, y,
-      vx: Math.cos(angle) * spd,
-      vy: Math.sin(angle) * spd - 4,
-      life: 2 + Math.random() * 2,
-      maxLife: 3,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      size: 3 + Math.random() * 5,
-      gravity: 0.08,
-      rotation: Math.random() * TAU,
-      rotSpeed: (Math.random() - 0.5) * 0.3
+      x, y, vx: Math.cos(angle) * spd, vy: Math.sin(angle) * spd - 4,
+      life: 2 + Math.random() * 2, maxLife: 3,
+      color: pickRandom(colors), size: 3 + Math.random() * 5, gravity: 0.08,
+      rotation: Math.random() * TAU, rotSpeed: (Math.random() - 0.5) * 0.3
     });
   }
 }
@@ -1156,10 +1204,7 @@ function spawnConfetti(x, y) {
 function updateParticles(dt) {
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += p.gravity;
-    p.life -= dt;
+    p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.life -= dt;
     if (p.rotation !== undefined) p.rotation += p.rotSpeed;
     if (p.life <= 0) particles.splice(i, 1);
   }
@@ -1191,25 +1236,19 @@ function generateCrowd() {
   for (let row = 0; row < 8; row++) {
     const density = 40 + row * 5;
     for (let i = 0; i < density; i++) {
-      const xPct = i / density;
-      const xJitter = (Math.random() - 0.5) * 4;
-      const yJitter = (Math.random() - 0.5) * 2;
-      const brightness = 0.15 + Math.random() * 0.15;
-      const isPatsFan = Math.random() > 0.5;
-      const dotSize = 1.5 + row * 0.3;
-      crowdDots.push({ row, xPct, xJitter, yJitter, brightness, isPatsFan, dotSize });
+      crowdDots.push({
+        row, xPct: i / density,
+        xJitter: (Math.random() - 0.5) * 4, yJitter: (Math.random() - 0.5) * 2,
+        brightness: 0.15 + Math.random() * 0.15, isPatsFan: Math.random() > 0.5,
+        dotSize: 1.5 + row * 0.3
+      });
     }
   }
 }
 generateCrowd();
 
-// ---- FIELD RENDERER (Pseudo-3D) ----
-// The field is rendered in perspective from behind the QB
-// Y coordinates: 0 = horizon (top), H = bottom of screen (near camera)
-
+// ---- FIELD RENDERER ----
 function worldToScreen(wx, wy) {
-  // wx: -1 to 1 (left to right across field)
-  // wy: 0 to 1 (near to far, 0=camera, 1=far end zone)
   const horizon = H * 0.28;
   const fov = 1.2;
   const d = 0.1 + wy * fov;
@@ -1220,7 +1259,6 @@ function worldToScreen(wx, wy) {
 }
 
 function drawField() {
-  // Sky / stadium
   const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.35);
   skyGrad.addColorStop(0, '#0a0a15');
   skyGrad.addColorStop(0.5, '#111128');
@@ -1228,10 +1266,8 @@ function drawField() {
   ctx.fillStyle = skyGrad;
   ctx.fillRect(0, 0, W, H * 0.35);
 
-  // Stadium lights (top)
   for (let i = 0; i < 5; i++) {
-    const lx = W * (0.1 + i * 0.2);
-    const ly = H * 0.02;
+    const lx = W * (0.1 + i * 0.2), ly = H * 0.02;
     const grad = ctx.createRadialGradient(lx, ly, 0, lx, ly, H * 0.25);
     grad.addColorStop(0, 'rgba(255,255,200,0.12)');
     grad.addColorStop(0.5, 'rgba(255,255,200,0.03)');
@@ -1240,25 +1276,19 @@ function drawField() {
     ctx.fillRect(lx - H * 0.25, ly, H * 0.5, H * 0.3);
   }
 
-  // Crowd (pre-generated dots for no flicker)
   const horizon = H * 0.28;
   const crowdTop = H * 0.05;
-  ctx.save();
   if (crowdDots) {
     for (const dot of crowdDots) {
       const y = crowdTop + dot.row * (horizon - crowdTop) / 8;
       const x = dot.xPct * W;
-      if (dot.isPatsFan) {
-        ctx.fillStyle = `rgba(0, 34, 68, ${dot.brightness})`;
-      } else {
-        ctx.fillStyle = `rgba(105, 190, 40, ${dot.brightness * 0.8})`;
-      }
+      ctx.fillStyle = dot.isPatsFan
+        ? `rgba(0,34,68,${dot.brightness})`
+        : `rgba(105,190,40,${dot.brightness * 0.8})`;
       ctx.fillRect(x + dot.xJitter, y + dot.yJitter, dot.dotSize, dot.dotSize * 1.5);
     }
   }
-  ctx.restore();
 
-  // Field surface
   const fieldTop = horizon;
   const fieldGrad = ctx.createLinearGradient(0, fieldTop, 0, H);
   fieldGrad.addColorStop(0, '#1B5E20');
@@ -1267,16 +1297,11 @@ function drawField() {
   ctx.fillStyle = fieldGrad;
   ctx.fillRect(0, fieldTop, W, H - fieldTop);
 
-  // Yard lines (perspective)
-  // Show lines relative to ball position
   const baseYard = Math.floor(ballYard / 5) * 5;
   for (let yd = -20; yd <= 60; yd += 5) {
-    const worldY = (yd + 20) / 80; // normalized 0-1 for rendering depth
+    const worldY = (yd + 20) / 80;
     const sp = worldToScreen(0, worldY);
-
     if (sp.y < fieldTop || sp.y > H) continue;
-
-    // Line width thins with distance
     const lineAlpha = Math.max(0.1, 1 - worldY * 0.9);
     ctx.strokeStyle = `rgba(255,255,255,${lineAlpha * 0.6})`;
     ctx.lineWidth = Math.max(0.5, (1 - worldY) * 2);
@@ -1287,7 +1312,6 @@ function drawField() {
     ctx.lineTo(right.x, sp.y);
     ctx.stroke();
 
-    // Yard numbers
     const actualYard = baseYard + yd;
     if (actualYard % 10 === 0 && actualYard >= 0 && actualYard <= 100) {
       const displayNum = actualYard <= 50 ? actualYard : 100 - actualYard;
@@ -1295,19 +1319,16 @@ function drawField() {
         ctx.fillStyle = `rgba(255,255,255,${lineAlpha * 0.4})`;
         ctx.font = `${Math.max(8, 14 * (1 - worldY))}px -apple-system, sans-serif`;
         ctx.textAlign = 'center';
-        const numLeft = worldToScreen(-0.85, worldY);
-        const numRight = worldToScreen(0.85, worldY);
-        ctx.fillText(displayNum, numLeft.x, sp.y - 2);
-        ctx.fillText(displayNum, numRight.x, sp.y - 2);
+        ctx.fillText(displayNum, worldToScreen(-0.85, worldY).x, sp.y - 2);
+        ctx.fillText(displayNum, worldToScreen(0.85, worldY).x, sp.y - 2);
       }
     }
   }
 
-  // Grass stripes (alternating shade)
+  // Grass stripes
   ctx.save();
   ctx.globalCompositeOperation = 'multiply';
-  for (let yd = -20; yd <= 60; yd += 5) {
-    if (yd % 10 !== 0) continue;
+  for (let yd = -20; yd <= 60; yd += 10) {
     const y1 = worldToScreen(0, (yd + 20) / 80).y;
     const y2 = worldToScreen(0, (yd + 25) / 80).y;
     if (y1 > H || y2 < fieldTop) continue;
@@ -1316,28 +1337,26 @@ function drawField() {
   }
   ctx.restore();
 
-  // End zone coloring
-  // Opponent end zone (far)
+  // End zone
   const ezFarTop = worldToScreen(0, 0.9).y;
   if (ezFarTop < H) {
-    ctx.fillStyle = 'rgba(105, 190, 40, 0.15)';
+    ctx.fillStyle = 'rgba(105,190,40,0.15)';
     ctx.fillRect(0, Math.max(fieldTop, ezFarTop), W, H * 0.05);
-    // "SEAHAWKS" text
     const sp = worldToScreen(0, 0.92);
     if (sp.y > fieldTop) {
-      ctx.fillStyle = 'rgba(105, 190, 40, 0.2)';
-      ctx.font = `bold ${Math.max(6, 12)}px -apple-system, sans-serif`;
+      ctx.fillStyle = 'rgba(105,190,40,0.2)';
+      ctx.font = 'bold 12px -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('SEAHAWKS', sp.x, sp.y);
     }
   }
 
-  // Line of scrimmage (bright line)
-  const losWorld = 0.25; // line of scrimmage fixed at camera-relative position
+  // Line of scrimmage
+  const losWorld = 0.25;
   const losScreen = worldToScreen(0, losWorld);
   const losLeft = worldToScreen(-1, losWorld);
   const losRight = worldToScreen(1, losWorld);
-  ctx.strokeStyle = 'rgba(0, 136, 255, 0.5)';
+  ctx.strokeStyle = 'rgba(0,136,255,0.5)';
   ctx.lineWidth = 2;
   ctx.setLineDash([6, 4]);
   ctx.beginPath();
@@ -1346,14 +1365,14 @@ function drawField() {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // First down line (yellow)
+  // First down line
   if (yardsToGo > 0 && down <= 4) {
-    const fdWorld = losWorld + (yardsToGo / 80) * 1;
+    const fdWorld = losWorld + (yardsToGo / 80);
     if (fdWorld < 1) {
       const fdScreen = worldToScreen(0, fdWorld);
       const fdLeft = worldToScreen(-1, fdWorld);
       const fdRight = worldToScreen(1, fdWorld);
-      ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
+      ctx.strokeStyle = 'rgba(255,215,0,0.6)';
       ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.moveTo(fdLeft.x, fdScreen.y);
@@ -1362,20 +1381,16 @@ function drawField() {
     }
   }
 
-  // Sideline markings
-  const sideL = worldToScreen(-0.95, 0);
-  const sideR = worldToScreen(0.95, 0);
-  const sideTopL = worldToScreen(-0.95, 1);
-  const sideTopR = worldToScreen(0.95, 1);
+  // Sidelines
   ctx.strokeStyle = 'rgba(255,255,255,0.15)';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(sideL.x, sideL.y);
-  ctx.lineTo(sideTopL.x, sideTopL.y);
+  ctx.moveTo(worldToScreen(-0.95, 0).x, worldToScreen(-0.95, 0).y);
+  ctx.lineTo(worldToScreen(-0.95, 1).x, worldToScreen(-0.95, 1).y);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(sideR.x, sideR.y);
-  ctx.lineTo(sideTopR.x, sideTopR.y);
+  ctx.moveTo(worldToScreen(0.95, 0).x, worldToScreen(0.95, 0).y);
+  ctx.lineTo(worldToScreen(0.95, 1).x, worldToScreen(0.95, 1).y);
   ctx.stroke();
 }
 
@@ -1385,50 +1400,42 @@ function drawPlayer(wx, wy, teamColor, accentColor, isHighlighted, label) {
   const s = sp.scale * 1.2;
   const px = sp.x, py = sp.y;
 
-  if (py < H * 0.2 || py > H + 20) return; // off screen
+  if (py < H * 0.2 || py > H + 20) return null;
 
-  // Shadow
   ctx.fillStyle = 'rgba(0,0,0,0.3)';
   ctx.beginPath();
   ctx.ellipse(px, py + 2 * s, 8 * s, 3 * s, 0, 0, TAU);
   ctx.fill();
 
-  // Body
   ctx.fillStyle = teamColor;
   ctx.beginPath();
   ctx.ellipse(px, py - 10 * s, 7 * s, 12 * s, 0, 0, TAU);
   ctx.fill();
 
-  // Jersey stripe
   ctx.fillStyle = accentColor;
   ctx.fillRect(px - 5 * s, py - 14 * s, 10 * s, 3 * s);
 
-  // Helmet
   ctx.fillStyle = teamColor;
   ctx.beginPath();
   ctx.arc(px, py - 22 * s, 6 * s, 0, TAU);
   ctx.fill();
 
-  // Facemask
   ctx.fillStyle = 'rgba(180,180,180,0.6)';
   ctx.fillRect(px - 3 * s, py - 20 * s, 6 * s, 2 * s);
 
-  // Highlight ring
   if (isHighlighted) {
     ctx.strokeStyle = '#FFD700';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.ellipse(px, py, 12 * s, 5 * s, 0, 0, TAU);
     ctx.stroke();
-    // Pulse ring
     const pulseSize = 14 + Math.sin(Date.now() / 200) * 4;
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.3)';
+    ctx.strokeStyle = 'rgba(255,215,0,0.3)';
     ctx.beginPath();
-    ctx.ellipse(px, py, pulseSize * s, (pulseSize * 0.4) * s, 0, 0, TAU);
+    ctx.ellipse(px, py, pulseSize * s, pulseSize * 0.4 * s, 0, 0, TAU);
     ctx.stroke();
   }
 
-  // Label (number or position)
   if (label && s > 0.3) {
     ctx.fillStyle = 'white';
     ctx.font = `bold ${Math.max(7, 10 * s)}px -apple-system, sans-serif`;
@@ -1444,19 +1451,16 @@ function drawBall(wx, wy, airborne) {
   const s = sp.scale;
   ctx.save();
   if (airborne) {
-    // Ball in air — draw with trail
     ctx.fillStyle = '#8B4513';
     ctx.beginPath();
     ctx.ellipse(sp.x, sp.y - 30 * s, 5 * s, 3 * s, -0.3, 0, TAU);
     ctx.fill();
-    // Laces
     ctx.strokeStyle = 'white';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(sp.x - 2 * s, sp.y - 31 * s);
     ctx.lineTo(sp.x + 2 * s, sp.y - 31 * s);
     ctx.stroke();
-    // Trail
     ctx.strokeStyle = 'rgba(255,255,255,0.3)';
     ctx.lineWidth = 2 * s;
     ctx.setLineDash([4, 4]);
@@ -1466,7 +1470,6 @@ function drawBall(wx, wy, airborne) {
     ctx.stroke();
     ctx.setLineDash([]);
   } else {
-    // Ball on ground or carried
     ctx.fillStyle = '#8B4513';
     ctx.beginPath();
     ctx.ellipse(sp.x, sp.y - 14 * s, 4 * s, 2.5 * s, 0, 0, TAU);
@@ -1475,39 +1478,22 @@ function drawBall(wx, wy, airborne) {
   ctx.restore();
 }
 
-// ---- FORMATION SETUP ----
+// ---- FORMATION ----
 function setupFormation(playType) {
   offensePlayers = [];
   defensePlayers = [];
 
-  // Offensive line (5 players at line of scrimmage)
-  for (let i = -2; i <= 2; i++) {
-    offensePlayers.push({ wx: i * 0.08, wy: 0.25, role: 'OL', label: '' });
-  }
-
-  // QB (behind center)
+  for (let i = -2; i <= 2; i++) offensePlayers.push({ wx: i * 0.08, wy: 0.25, role: 'OL', label: '' });
   offensePlayers.push({ wx: 0, wy: 0.2, role: 'QB', label: 'QB' });
-
-  // RB (behind QB)
   offensePlayers.push({ wx: 0.05, wy: 0.15, role: 'RB', label: 'RB' });
-
-  // Wide receivers
   offensePlayers.push({ wx: -0.45, wy: 0.26, role: 'WR', label: 'WR' });
   offensePlayers.push({ wx: 0.45, wy: 0.26, role: 'WR', label: 'WR' });
   offensePlayers.push({ wx: -0.3, wy: 0.24, role: 'WR', label: 'WR' });
 
-  // Defense
-  // DL (4 defensive linemen)
-  for (let i = -1.5; i <= 1.5; i++) {
-    defensePlayers.push({ wx: i * 0.07, wy: 0.29, role: 'DL', label: '' });
-  }
-
-  // Linebackers
+  for (let i = -1.5; i <= 1.5; i++) defensePlayers.push({ wx: i * 0.07, wy: 0.29, role: 'DL', label: '' });
   defensePlayers.push({ wx: -0.15, wy: 0.35, role: 'LB', label: 'LB' });
   defensePlayers.push({ wx: 0, wy: 0.37, role: 'LB', label: 'LB' });
   defensePlayers.push({ wx: 0.15, wy: 0.35, role: 'LB', label: 'LB' });
-
-  // Defensive backs
   defensePlayers.push({ wx: -0.4, wy: 0.42, role: 'CB', label: 'CB' });
   defensePlayers.push({ wx: 0.4, wy: 0.42, role: 'CB', label: 'CB' });
   defensePlayers.push({ wx: -0.1, wy: 0.5, role: 'S', label: 'S' });
@@ -1515,12 +1501,8 @@ function setupFormation(playType) {
 }
 
 function drawFormation(highlightReceivers) {
-  // Draw defense first (further away)
-  for (const p of defensePlayers) {
-    drawPlayer(p.wx, p.wy, SEA.primary, SEA.secondary, false, p.label);
-  }
+  for (const p of defensePlayers) drawPlayer(p.wx, p.wy, SEA.primary, SEA.secondary, false, p.label);
 
-  // Draw offense
   receiverTargets = [];
   for (const p of offensePlayers) {
     const isWR = p.role === 'WR';
@@ -1533,84 +1515,42 @@ function drawFormation(highlightReceivers) {
 }
 
 // ---- PLAY ANIMATION ----
-let animStartTime = 0;
-let animDuration = 2500;
-let animPlayers = [];
-let animBallPath = [];
-let animResult = '';
-let animYards = 0;
-let animPhase = 0; // 0=running, 1=result shown
-
 function startPlayAnimation(play) {
   animStartTime = Date.now();
-  animPhase = 0;
-  animPlayers = [];
-  animBallPath = [];
 
   const difficulty = GAME_DEFS[currentGame].defDifficulty;
 
   if (play.type === 'run') {
-    // Determine yards gained
     const base = 3 + Math.random() * 8;
     const defStop = Math.random() < difficulty ? -(2 + Math.random() * 3) : 0;
     animYards = Math.round(Math.max(-3, base + defStop));
-
-    // Big play chance
-    if (Math.random() > 0.85 - (1 - difficulty) * 0.15) {
-      animYards = Math.round(15 + Math.random() * 25);
-    }
-
-    // Check for touchdown
-    if (ballYard + animYards >= 100) {
-      animYards = 100 - ballYard;
-      animResult = 'touchdown';
-    } else {
-      animResult = 'complete';
-    }
-
+    if (Math.random() > 0.85 - (1 - difficulty) * 0.15) animYards = Math.round(15 + Math.random() * 25);
+    if (ballYard + animYards >= 100) { animYards = 100 - ballYard; animResult = 'touchdown'; }
+    else animResult = 'complete';
     animDuration = 2000;
-
   } else if (play.type === 'pass') {
     const isDeep = play.range === 'deep';
     const catchChance = isDeep ? (0.55 - difficulty * 0.3) : (0.75 - difficulty * 0.2);
     const intChance = isDeep ? (0.08 + difficulty * 0.1) : (0.02 + difficulty * 0.05);
-
-    // Only allow interceptions after game 2
     const canIntercept = currentGame >= 2;
-
     const roll = Math.random();
     if (roll < catchChance) {
-      // Complete
       animYards = isDeep ? Math.round(20 + Math.random() * 30) : Math.round(5 + Math.random() * 12);
-      if (ballYard + animYards >= 100) {
-        animYards = 100 - ballYard;
-        animResult = 'touchdown';
-      } else {
-        animResult = 'complete';
-      }
+      if (ballYard + animYards >= 100) { animYards = 100 - ballYard; animResult = 'touchdown'; }
+      else animResult = 'complete';
     } else if (canIntercept && roll > (1 - intChance)) {
-      animResult = 'interception';
-      animYards = 0;
+      animResult = 'interception'; animYards = 0;
     } else {
-      animResult = 'incomplete';
-      animYards = 0;
+      animResult = 'incomplete'; animYards = 0;
     }
-
     animDuration = isDeep ? 2800 : 2200;
   }
 
   // Penalty chance (game 3+)
   if (currentGame >= 2 && Math.random() < 0.12) {
-    const penaltyType = Math.random() > 0.5 ? 'offsides' : 'holding';
-    if (penaltyType === 'offsides' && !taughtMoments.has('penalty_offsides')) {
-      animResult = 'penalty_offsides';
-      animYards = 5;
-      animDuration = 1500;
-    } else if (penaltyType === 'holding' && Math.random() < 0.3) {
-      animResult = 'penalty_holding';
-      animYards = 10;
-      animDuration = 1500;
-    }
+    const penType = Math.random() > 0.5 ? 'offsides' : 'holding';
+    if (penType === 'offsides') { animResult = 'penalty_offsides'; animYards = 5; animDuration = 1500; }
+    else if (Math.random() < 0.3) { animResult = 'penalty_holding'; animYards = 10; animDuration = 1500; }
   }
 
   playSound('whistle');
@@ -1621,40 +1561,27 @@ function drawPlayAnimation(play) {
   const elapsed = Date.now() - animStartTime;
   const t = Math.min(1, elapsed / animDuration);
 
-  // Move players based on play type
-  ctx.save();
-
-  // Animate offensive players forward
   for (const p of offensePlayers) {
     let dx = 0, dy = 0;
     if (p.role === 'RB' && play.type === 'run') {
       dy = t * 0.15;
       dx = play.id === 'run_left' ? -t * 0.1 : play.id === 'run_right' ? t * 0.1 : 0;
     } else if (p.role === 'WR') {
-      dy = t * 0.2;
-      dx = p.wx < 0 ? -t * 0.05 : t * 0.05;
+      dy = t * 0.2; dx = p.wx < 0 ? -t * 0.05 : t * 0.05;
     } else if (p.role === 'OL') {
       dy = t * 0.03;
     }
     drawPlayer(p.wx + dx, p.wy + dy, PATS.primary, PATS.secondary, false, p.label);
   }
 
-  // Animate defensive players
   for (const p of defensePlayers) {
-    let dy = -t * 0.04;
-    drawPlayer(p.wx, p.wy + dy, SEA.primary, SEA.secondary, false, p.label);
+    drawPlayer(p.wx, p.wy - t * 0.04, SEA.primary, SEA.secondary, false, p.label);
   }
 
-  // Ball
   if (play.type === 'pass' && t > 0.2 && t < 0.7) {
-    // Ball in air
     const ballT = (t - 0.2) / 0.5;
     const targetWR = offensePlayers.find(p => p.role === 'WR');
-    if (targetWR) {
-      const bx = targetWR.wx + (play.range === 'deep' ? 0 : 0);
-      const by = 0.2 + ballT * 0.25;
-      drawBall(bx, by, true);
-    }
+    if (targetWR) drawBall(targetWR.wx, 0.2 + ballT * 0.25, true);
   } else if (play.type === 'run') {
     const rb = offensePlayers.find(p => p.role === 'RB');
     if (rb) {
@@ -1663,12 +1590,7 @@ function drawPlayAnimation(play) {
     }
   }
 
-  ctx.restore();
-
-  // Camera shake on hit
-  if (t > 0.8 && t < 0.95) {
-    cameraShake = (1 - (t - 0.8) / 0.15) * 4;
-  }
+  if (t > 0.8 && t < 0.95) cameraShake = (1 - (t - 0.8) / 0.15) * 4;
 }
 
 // ---- COMMENTARY SYSTEM ----
@@ -1679,9 +1601,7 @@ function showCommentary(pbp, color, duration) {
 
 function processCommentaryQueue() {
   if (currentCommentary || commentaryQueue.length === 0) return;
-
   currentCommentary = commentaryQueue.shift();
-  const bar = commentaryBar;
 
   pbpText.innerHTML = '<span class="espn-tag">ESPN</span>' + currentCommentary.pbp;
   if (currentCommentary.color) {
@@ -1691,15 +1611,12 @@ function processCommentaryQueue() {
     colorText.style.display = 'none';
   }
 
-  bar.classList.add('visible');
+  commentaryBar.classList.add('visible');
   playSound('bloop');
 
   commentaryTimer = setTimeout(() => {
-    bar.classList.remove('visible');
-    setTimeout(() => {
-      currentCommentary = null;
-      processCommentaryQueue();
-    }, 500);
+    commentaryBar.classList.remove('visible');
+    setTimeout(() => { currentCommentary = null; processCommentaryQueue(); }, 500);
   }, currentCommentary.duration);
 }
 
@@ -1710,42 +1627,95 @@ function clearCommentary() {
   commentaryQueue = [];
 }
 
-// ---- MOMENT CARD SYSTEM ----
-function showMoment(key) {
+// ---- MOMENT CARD SYSTEM (Queue-based, never blocks) ----
+function queueMoment(key) {
   if (taughtMoments.has(key) || !MOMENTS[key]) return;
   taughtMoments.add(key);
+  momentQueue.push(key);
+}
 
+function showNextMoment() {
+  // If a moment is already showing or queue is empty, do nothing
+  if (momentCard.classList.contains('visible') || momentQueue.length === 0) return;
+
+  const key = momentQueue.shift();
   const m = MOMENTS[key];
   $('moment-emoji').textContent = m.emoji;
   $('moment-title').textContent = m.title;
   $('moment-body').innerHTML = m.body;
 
+  // Save current state so we can return to it
+  prevStateBeforeMoment = gameState;
+  gameState = 'MOMENT';
+
+  // Hide play cards while moment is showing
+  playCardsEl.classList.remove('visible');
+
   dimOverlay.classList.add('visible');
   momentCard.classList.add('visible');
-  gameState = 'MOMENT';
   playSound('bloop');
 }
 
-function hideMoment() {
+function dismissMoment() {
   momentCard.classList.remove('visible');
   dimOverlay.classList.remove('visible');
+
+  // Restore previous state
+  const restoreTo = prevStateBeforeMoment;
+  prevStateBeforeMoment = null;
+
+  // If there are more moments queued, show the next one after a brief delay
+  if (momentQueue.length > 0) {
+    setTimeout(() => showNextMoment(), 400);
+    return;
+  }
+
+  // No more moments — return to gameplay
+  // If we were in the middle of resolving a play, do that now
+  if (pendingResolve) {
+    const fn = pendingResolve;
+    pendingResolve = null;
+    fn();
+    return;
+  }
+
+  // Otherwise restore to wherever we were
+  if (restoreTo === 'PLAY_CALL' || restoreTo === 'PLAY_RESULT' || !restoreTo) {
+    // Continue the drive
+    gameState = 'PLAY_CALL';
+    setupFormation('run');
+    showPlayCards();
+  } else {
+    gameState = restoreTo;
+  }
+}
+
+// Trigger moments and then show cards — called from startNextPlay
+function showMomentsOrCards(momentKeys, afterMomentsFn) {
+  // Queue up all the moment keys
+  for (const key of momentKeys) queueMoment(key);
+
+  // If there are moments to show, show them first
+  if (momentQueue.length > 0) {
+    pendingResolve = afterMomentsFn;
+    showNextMoment();
+  } else {
+    // No moments, go straight to the callback
+    afterMomentsFn();
+  }
 }
 
 // ---- SCOREBOARD UPDATE ----
 function updateScoreboard() {
   $('pats-score').textContent = patsScore;
   $('sea-score').textContent = seaScore;
-
   const ordinals = ['', '1ST', '2ND', '3RD', '4TH'];
   $('down-distance').textContent = `${ordinals[down] || '4TH'} & ${yardsToGo}`;
-
   const mins = Math.floor(gameClock / 60);
   const secs = gameClock % 60;
   $('quarter-time').textContent = `Q${quarter} ${mins}:${secs.toString().padStart(2, '0')}`;
-
   $('pats-possession').classList.toggle('active', isPatsOffense);
   $('sea-possession').classList.toggle('active', !isPatsOffense);
-
   const gameNames = ['The Basics', 'Air It Out', 'The Full Picture', 'Clock Management', 'The Super Bowl'];
   $('game-label').textContent = `Game ${currentGame + 1} — ${gameNames[currentGame]}`;
 }
@@ -1755,7 +1725,6 @@ function showPlayCards() {
   const gameDef = GAME_DEFS[currentGame];
   let plays = [...gameDef.plays];
 
-  // Add field goal option on 4th down if in range (game 3+)
   if (currentGame >= 2 && down === 4 && ballYard >= 55) {
     plays.push({ id: 'field_goal', name: 'Field Goal', icon: '🥅', desc: '3 points!', type: 'kick' });
   }
@@ -1764,11 +1733,7 @@ function showPlayCards() {
   for (const play of plays) {
     const card = document.createElement('div');
     card.className = 'play-card';
-    card.innerHTML = `
-      <span class="card-icon">${play.icon}</span>
-      <div class="card-name">${play.name}</div>
-      <div class="card-desc">${play.desc}</div>
-    `;
+    card.innerHTML = `<span class="card-icon">${play.icon}</span><div class="card-name">${play.name}</div><div class="card-desc">${play.desc}</div>`;
     let cardTouched = false;
     card.addEventListener('touchend', (e) => { e.preventDefault(); cardTouched = true; selectPlay(play); });
     card.addEventListener('click', () => { if (!cardTouched) selectPlay(play); cardTouched = false; });
@@ -1788,13 +1753,8 @@ function selectPlay(play) {
   selectedPlay = play;
   hidePlayCards();
 
-  if (play.type === 'kick') {
-    // Field goal attempt
-    executeFieldGoal();
-    return;
-  }
+  if (play.type === 'kick') { executeFieldGoal(); return; }
 
-  // Set up formation and show snap prompt
   setupFormation(play.type);
   gameState = 'SNAP_WAIT';
   snapPrompt.classList.add('visible');
@@ -1805,11 +1765,12 @@ function snapBall() {
   snapPrompt.classList.remove('visible');
 
   if (selectedPlay.type === 'pass') {
-    // Show receivers to tap
     gameState = 'PASS_TARGET';
-    // Draw will highlight receivers
+    // Show commentary hint for pass
+    if (!taughtMoments.has('receivers') && currentGame >= 1) {
+      showCommentary("Tap a receiver to throw!", "See those highlighted players? Tap one!", 3000);
+    }
   } else {
-    // Run play — auto execute
     gameState = 'PLAY_ACTIVE';
     startPlayAnimation(selectedPlay);
     setTimeout(() => resolvePlay(), animDuration + 200);
@@ -1826,19 +1787,24 @@ function throwToReceiver(target) {
 
 function executeFieldGoal() {
   gameState = 'PLAY_ACTIVE';
-  const distance = 100 - ballYard + 17; // FG distance = yards to endzone + 17
+  const distance = 100 - ballYard + 17;
   const makeChance = Math.max(0.3, 1 - distance / 60);
   const made = Math.random() < makeChance;
 
-  showCommentary(
-    `Field goal attempt from ${distance} yards...`,
-    made ? "It's GOOD! Three points!" : "No good! Wide right!",
-    3000
-  );
+  const attempt = pickRandom(COMMENTARY.FG_ATTEMPT);
+  showCommentary(fillTemplate(attempt.pbp, { distance }), '', 2000);
 
-  if (!taughtMoments.has('field_goal')) {
-    setTimeout(() => showMoment('field_goal'), 1500);
-  }
+  setTimeout(() => {
+    if (made) {
+      const good = pickRandom(COMMENTARY.FG_GOOD);
+      showCommentary(good.pbp, good.color, 3500);
+    } else {
+      const miss = pickRandom(COMMENTARY.FG_MISS);
+      showCommentary(miss.pbp, miss.color, 3500);
+    }
+  }, 2000);
+
+  queueMoment('field_goal');
 
   setTimeout(() => {
     if (made) {
@@ -1848,12 +1814,23 @@ function executeFieldGoal() {
     }
     updateScoreboard();
     advanceClock(25);
-    endPossession();
-  }, 2500);
+
+    // If moments queued, show them before ending possession
+    if (momentQueue.length > 0) {
+      pendingResolve = () => endPossession();
+      showNextMoment();
+    } else {
+      endPossession();
+    }
+  }, 3500);
 }
 
 function resolvePlay() {
-  if (gameState === 'MOMENT') return; // wait for moment to clear
+  // If a moment is showing, defer resolution
+  if (gameState === 'MOMENT') {
+    pendingResolve = () => resolvePlay();
+    return;
+  }
 
   gameState = 'PLAY_RESULT';
 
@@ -1863,118 +1840,163 @@ function resolvePlay() {
 
   // Commentary
   const lines = getPlayCommentary(play, result, yards);
-  for (const line of lines) {
-    showCommentary(line.pbp, line.color, 3500);
-  }
+  for (const line of lines) showCommentary(line.pbp, line.color, 3500);
 
-  // Teach moments based on result
   if (result === 'touchdown') {
-    setTimeout(() => {
-      if (!taughtMoments.has('touchdown')) {
-        showMoment('touchdown');
-      }
-      playSound('touchdown');
-      playSound('crowd_roar');
-      spawnConfetti(W / 2, H * 0.4);
-      cameraShake = 6;
-    }, 500);
-
-    setTimeout(() => {
-      patsScore += 7; // TD + PAT simplified
-      updateScoreboard();
-      advanceClock(40);
-      endPossession();
-    }, 3000);
+    handleTouchdown();
     return;
   }
 
   if (result === 'interception') {
-    if (!taughtMoments.has('interception')) {
-      setTimeout(() => showMoment('interception'), 800);
-    }
-    spawnParticles(W / 2, H * 0.4, 20, SEA.secondary, 3, 1);
-    setTimeout(() => {
-      advanceClock(30);
-      endPossession();
-    }, 2500);
+    handleInterception();
     return;
   }
 
   if (result === 'incomplete') {
-    if (!taughtMoments.has('incomplete')) {
-      setTimeout(() => showMoment('incomplete'), 800);
-    }
-    // Don't advance ball, clock stops
-    advanceClock(currentGame >= 3 ? 0 : 15);
-    down++;
-    checkDowns();
+    handleIncomplete();
     return;
   }
 
   if (result === 'penalty_offsides') {
-    if (!taughtMoments.has('penalty_offsides')) {
-      setTimeout(() => showMoment('penalty_offsides'), 500);
-    }
-    showCommentary("Flag on the play! Offsides on the defense.", "Free 5 yards! The defense jumped early.", 3500);
-    ballYard += 5;
-    yardsToGo = Math.max(1, yardsToGo - 5);
-    if (yardsToGo <= 0) { down = 1; yardsToGo = 10; }
-    advanceClock(15);
-    setTimeout(() => startNextPlay(), 2500);
+    handlePenaltyOffsides();
     return;
   }
 
   if (result === 'penalty_holding') {
-    if (!taughtMoments.has('penalty_holding')) {
-      setTimeout(() => showMoment('penalty_holding'), 500);
-    }
-    showCommentary("Flag! Holding on the defense.", "10-yard penalty and an automatic first down!", 3500);
-    ballYard += 10;
-    down = 1;
-    yardsToGo = 10;
-    advanceClock(15);
-    setTimeout(() => startNextPlay(), 2500);
+    handlePenaltyHolding();
     return;
   }
 
   // Normal play result
-  ballYard += yards;
+  ballYard = clamp(ballYard + yards, 1, 99);
   yardsToGo -= yards;
   advanceClock(play.type === 'run' ? 35 : 20);
 
-  // First down?
+  // Check for TD in case ballYard reached 100 (clamped to 99 but yards might push past)
+  if (ballYard + yards >= 100) {
+    ballYard = 100;
+    handleTouchdown();
+    return;
+  }
+
   if (yardsToGo <= 0) {
     down = 1;
     yardsToGo = 10;
-    if (!taughtMoments.has('first_down') && currentGame >= 1) {
-      setTimeout(() => showMoment('first_down'), 500);
-    } else {
-      showCommentary("First down!", "Fresh set of downs — 4 more chances to go 10 yards.", 2500);
-    }
+    const fdLines = pickRandom(COMMENTARY.FIRST_DOWN);
+    showCommentary(fdLines.pbp, fdLines.color, 2500);
+    queueMoment('first_down');
   } else {
     down++;
   }
 
-  // Hit particles
   spawnParticles(W / 2, H * 0.55, 10, 'rgba(255,255,255,0.5)', 2, 0.5);
-
   checkDowns();
+}
+
+function handleTouchdown() {
+  queueMoment('touchdown');
+
+  playSound('touchdown');
+  playSound('crowd_roar');
+  spawnConfetti(W / 2, H * 0.4);
+  cameraShake = 6;
+
+  setTimeout(() => {
+    patsScore += 7;
+    updateScoreboard();
+    advanceClock(40);
+
+    if (momentQueue.length > 0) {
+      pendingResolve = () => endPossession();
+      showNextMoment();
+    } else {
+      endPossession();
+    }
+  }, 2500);
+}
+
+function handleInterception() {
+  queueMoment('interception');
+  spawnParticles(W / 2, H * 0.4, 20, SEA.secondary, 3, 1);
+
+  setTimeout(() => {
+    advanceClock(30);
+    if (momentQueue.length > 0) {
+      pendingResolve = () => endPossession();
+      showNextMoment();
+    } else {
+      endPossession();
+    }
+  }, 2000);
+}
+
+function handleIncomplete() {
+  queueMoment('incomplete');
+  advanceClock(currentGame >= 3 ? 0 : 15);
+  down++;
+
+  if (momentQueue.length > 0) {
+    pendingResolve = () => checkDowns();
+    showNextMoment();
+  } else {
+    checkDowns();
+  }
+}
+
+function handlePenaltyOffsides() {
+  queueMoment('penalty_offsides');
+  const penLine = pickRandom(COMMENTARY.PENALTY_OFFSIDES);
+  showCommentary(penLine.pbp, penLine.color, 3500);
+
+  ballYard = clamp(ballYard + 5, 1, 99);
+  yardsToGo -= 5;
+  if (yardsToGo <= 0) { down = 1; yardsToGo = 10; }
+  advanceClock(15);
+  updateScoreboard();
+
+  if (momentQueue.length > 0) {
+    pendingResolve = () => { gameState = 'PLAY_CALL'; setupFormation('run'); showPlayCards(); };
+    showNextMoment();
+  } else {
+    setTimeout(() => { gameState = 'PLAY_CALL'; setupFormation('run'); showPlayCards(); }, 2000);
+  }
+}
+
+function handlePenaltyHolding() {
+  queueMoment('penalty_holding');
+  const penLine = pickRandom(COMMENTARY.PENALTY_HOLDING);
+  showCommentary(penLine.pbp, penLine.color, 3500);
+
+  ballYard = clamp(ballYard + 10, 1, 99);
+  down = 1;
+  yardsToGo = 10;
+  advanceClock(15);
+  updateScoreboard();
+
+  if (momentQueue.length > 0) {
+    pendingResolve = () => { gameState = 'PLAY_CALL'; setupFormation('run'); showPlayCards(); };
+    showNextMoment();
+  } else {
+    setTimeout(() => { gameState = 'PLAY_CALL'; setupFormation('run'); showPlayCards(); }, 2000);
+  }
 }
 
 function checkDowns() {
   updateScoreboard();
 
   if (down > 4) {
-    // Turnover on downs
-    showCommentary("Turnover on downs!", "Couldn't get the first down in 4 tries. The Seahawks take over.", 3500);
+    const line = pickRandom(COMMENTARY.TURNOVER_ON_DOWNS);
+    showCommentary(line.pbp, line.color, 3500);
     setTimeout(() => endPossession(), 2000);
     return;
   }
 
-  // 4th down commentary
   if (down === 4 && currentGame >= 2) {
-    const dc = getDownCommentary(down, yardsToGo, ballYard);
-    if (dc) showCommentary(dc.pbp, dc.color, 3000);
+    if (ballYard >= 55) {
+      showCommentary("4th down — field goal range!", "You can try for 3 points with a kick, or go for it!", 3000);
+    } else {
+      showCommentary("4th down — decision time.", "It's risky to go for it. But you're gutsy, right?", 3000);
+    }
   }
 
   // Continue drive
@@ -1982,10 +2004,10 @@ function checkDowns() {
 }
 
 function advanceClock(seconds) {
-  if (currentGame < 3) return; // Clock doesn't matter in early games
+  if (currentGame < 3) return;
   gameClock = Math.max(0, gameClock - seconds);
   if (gameClock <= 120 && !taughtMoments.has('two_minute') && currentGame >= 3) {
-    showMoment('two_minute');
+    queueMoment('two_minute');
   }
   updateScoreboard();
 }
@@ -1994,25 +2016,26 @@ function endPossession() {
   driveCount++;
   playsThisDrive = 0;
 
-  // Seahawks "drive" — they auto-score sometimes
   const seaScoreChance = GAME_DEFS[currentGame].defDifficulty;
   if (Math.random() < seaScoreChance) {
     const seaTD = Math.random() > 0.3;
     if (seaTD) {
       seaScore += 7;
-      showCommentary("Seahawks drive down the field and SCORE!", "Touchdown Seattle. They make it look easy.", 3500);
+      const line = pickRandom(COMMENTARY.SEA_TD);
+      showCommentary(line.pbp, line.color, 3500);
     } else {
       seaScore += 3;
-      showCommentary("Seahawks kick a field goal.", "3 points for Seattle. They couldn't punch it in.", 3000);
+      const line = pickRandom(COMMENTARY.SEA_FG);
+      showCommentary(line.pbp, line.color, 3000);
     }
     playSound('crowd_roar');
   } else {
-    showCommentary("Seahawks go 3 and out!", "Great defensive stop! We get the ball back.", 3000);
+    const line = pickRandom(COMMENTARY.SEA_PUNT);
+    showCommentary(line.pbp, line.color, 3000);
   }
 
   updateScoreboard();
 
-  // Check if game should end
   if (driveCount >= totalDrivesPerHalf * 2) {
     setTimeout(() => endGame(), 3000);
     return;
@@ -2020,23 +2043,13 @@ function endPossession() {
 
   // Quarter transitions
   if (driveCount === totalDrivesPerHalf) {
-    quarter = 3;
-    gameClock = 900;
-    showCommentary("Halftime is over! Second half begins.", "Let's see if we can keep this going!", 3000);
+    quarter = 3; gameClock = 900;
+    showCommentary("Second half begins!", "Let's keep this momentum going!", 3000);
     updateScoreboard();
   }
-  if (driveCount === Math.floor(totalDrivesPerHalf * 0.5)) {
-    quarter = 2;
-    gameClock = 900;
-    updateScoreboard();
-  }
-  if (driveCount === Math.floor(totalDrivesPerHalf * 1.5)) {
-    quarter = 4;
-    gameClock = 900;
-    updateScoreboard();
-  }
+  if (driveCount === Math.floor(totalDrivesPerHalf * 0.5)) { quarter = 2; gameClock = 900; updateScoreboard(); }
+  if (driveCount === Math.floor(totalDrivesPerHalf * 1.5)) { quarter = 4; gameClock = 900; updateScoreboard(); }
 
-  // Start new possession
   isPatsOffense = true;
   ballYard = 20 + Math.floor(Math.random() * 10);
   down = 1;
@@ -2046,46 +2059,34 @@ function endPossession() {
 }
 
 function startNextPlay() {
+  // If moment is showing, wait
   if (gameState === 'MOMENT') {
-    // Wait for moment card to close
-    setTimeout(() => startNextPlay(), 500);
+    pendingResolve = () => startNextPlay();
     return;
   }
 
   playsThisDrive++;
   updateScoreboard();
 
-  // Teach concepts for current game
+  // Determine which moments to teach before this play
   const concepts = GAME_DEFS[currentGame].concepts;
+  const momentsToTeach = [];
+
   if (playsThisDrive === 1 && driveCount === 0) {
-    // First play ever — teach fundamentals
-    if (concepts.includes('field') && !taughtMoments.has('field')) {
-      showMoment('field');
-      setTimeout(() => {
-        if (concepts.includes('offense') && !taughtMoments.has('offense')) {
-          showMoment('offense');
-        }
-      }, 500);
-    }
-    if (concepts.includes('passing') && !taughtMoments.has('passing')) {
-      showMoment('passing');
-    }
-    if (concepts.includes('downs') && !taughtMoments.has('downs') && currentGame >= 1) {
-      showMoment('downs');
-    }
-    if (concepts.includes('clock') && !taughtMoments.has('clock')) {
-      showMoment('clock');
-    }
+    if (concepts.includes('field')) momentsToTeach.push('field');
+    if (concepts.includes('offense')) momentsToTeach.push('offense');
+    if (concepts.includes('passing')) momentsToTeach.push('passing');
+    if (concepts.includes('downs')) momentsToTeach.push('downs');
+    if (concepts.includes('clock')) momentsToTeach.push('clock');
   }
+  if (playsThisDrive === 2 && concepts.includes('running')) momentsToTeach.push('running');
 
-  if (playsThisDrive === 2 && concepts.includes('running') && !taughtMoments.has('running')) {
-    showMoment('running');
-  }
-
-  // Show play cards
-  gameState = 'PLAY_CALL';
-  setupFormation('run');
-  showPlayCards();
+  // Show moments first, then transition to PLAY_CALL
+  showMomentsOrCards(momentsToTeach, () => {
+    gameState = 'PLAY_CALL';
+    setupFormation('run');
+    showPlayCards();
+  });
 }
 
 function endGame() {
@@ -2102,8 +2103,8 @@ function endGame() {
 
   if (won) {
     $('result-msg').textContent = currentGame < 4
-      ? `Great job! You beat the Seahawks! Ready for the next challenge?`
-      : `YOU WON THE SUPER BOWL! You've mastered football! 🏈`;
+      ? 'Great job! You beat the Seahawks! Ready for the next challenge?'
+      : "YOU WON THE SUPER BOWL! You've mastered football!";
     $('btn-next').textContent = currentGame < 4 ? 'Next Game' : 'Play Again';
     $('btn-next').style.display = 'block';
     spawnConfetti(W / 2, H / 2);
@@ -2115,37 +2116,28 @@ function endGame() {
 
   gameOverEl.style.display = 'flex';
   playSound('crowd_roar');
+  saveState();
 }
 
 $('btn-next').addEventListener('click', () => {
-  if (currentGame < 4) {
-    currentGame++;
-  } else {
-    currentGame = 0;
-    taughtMoments.clear();
-  }
+  if (currentGame < 4) currentGame++;
+  else { currentGame = 0; taughtMoments.clear(); }
   startNewGame();
 });
 
-$('btn-replay').addEventListener('click', () => {
-  startNewGame();
-});
+$('btn-replay').addEventListener('click', () => { startNewGame(); });
 
 function startNewGame() {
   gameOverEl.style.display = 'none';
-  patsScore = 0;
-  seaScore = 0;
-  down = 1;
-  yardsToGo = 10;
-  ballYard = 25;
-  quarter = 1;
-  gameClock = 900;
-  driveCount = 0;
-  playsThisDrive = 0;
-  isPatsOffense = true;
-  particles = [];
-
+  patsScore = 0; seaScore = 0;
+  down = 1; yardsToGo = 10;
+  ballYard = 25; quarter = 1; gameClock = 900;
+  driveCount = 0; playsThisDrive = 0;
+  isPatsOffense = true; particles = [];
+  momentQueue = []; pendingResolve = null;
+  clearCommentary();
   showMatchupCard();
+  saveState();
 }
 
 // ---- TUNNEL SEQUENCE ----
@@ -2159,38 +2151,38 @@ const tunnelTexts = [
   "LET'S PLAY SOME FOOTBALL!"
 ];
 
-let tunnelPhase = 0;
-let tunnelStartTime = 0;
-let tunnelLight = 0;
-
 function startTunnel() {
   gameState = 'TUNNEL';
   tunnelOverlay.style.display = 'block';
   tunnelPhase = 0;
   tunnelStartTime = Date.now();
   tunnelLight = 0;
+  tunnelAborted = false;
+  tunnelTimeouts = [];
   showTunnelText(0);
   startCrowdAmbient();
 }
 
 function showTunnelText(index) {
-  if (index >= tunnelTexts.length) {
-    endTunnel();
-    return;
-  }
+  if (tunnelAborted) return;
+  if (index >= tunnelTexts.length) { endTunnel(); return; }
   tunnelPhase = index;
   const textEl = $('tunnel-text');
   textEl.classList.remove('visible');
-  setTimeout(() => {
+  const t1 = setTimeout(() => {
+    if (tunnelAborted) return;
     textEl.textContent = tunnelTexts[index];
     textEl.classList.add('visible');
-    // Auto-advance
     const delay = index === 0 ? 2000 : index === tunnelTexts.length - 1 ? 1500 : 2200;
-    setTimeout(() => {
+    const t2 = setTimeout(() => {
+      if (tunnelAborted) return;
       textEl.classList.remove('visible');
-      setTimeout(() => showTunnelText(index + 1), 400);
+      const t3 = setTimeout(() => { if (!tunnelAborted) showTunnelText(index + 1); }, 400);
+      tunnelTimeouts.push(t3);
     }, delay);
+    tunnelTimeouts.push(t2);
   }, 100);
+  tunnelTimeouts.push(t1);
 }
 
 function drawTunnel() {
@@ -2200,74 +2192,62 @@ function drawTunnel() {
   tunnelCtx.fillStyle = '#000';
   tunnelCtx.fillRect(0, 0, W, H);
 
-  // Tunnel walls
   const cx = W / 2, cy = H / 2;
-
-  // Outer tunnel frame
-  const tunnelWidth = W * 0.85;
-  const tunnelHeight = H * 0.7;
-
-  // Darkness gradient
+  const tunnelWidth = W * 0.85, tunnelHeight = H * 0.7;
   const outerRad = Math.max(tunnelWidth, tunnelHeight) * 0.5;
   const innerRad = outerRad * (0.1 + tunnelLight * 0.9);
 
-  // Tunnel light at end
   const grad = tunnelCtx.createRadialGradient(cx, cy * 0.8, innerRad * 0.1, cx, cy * 0.8, innerRad);
-  grad.addColorStop(0, `rgba(200, 220, 255, ${tunnelLight * 0.8})`);
-  grad.addColorStop(0.3, `rgba(100, 150, 200, ${tunnelLight * 0.3})`);
-  grad.addColorStop(0.7, `rgba(20, 40, 60, ${tunnelLight * 0.1})`);
+  grad.addColorStop(0, `rgba(200,220,255,${tunnelLight * 0.8})`);
+  grad.addColorStop(0.3, `rgba(100,150,200,${tunnelLight * 0.3})`);
+  grad.addColorStop(0.7, `rgba(20,40,60,${tunnelLight * 0.1})`);
   grad.addColorStop(1, 'rgba(0,0,0,0)');
   tunnelCtx.fillStyle = grad;
   tunnelCtx.fillRect(0, 0, W, H);
 
-  // Tunnel arch edges
-  tunnelCtx.strokeStyle = `rgba(100,100,120, ${0.2 + tunnelLight * 0.3})`;
-  tunnelCtx.lineWidth = 3;
-  const perspScale = 0.3 + tunnelLight * 0.7;
-
-  // Draw receding tunnel rings
   for (let i = 0; i < 6; i++) {
     const d = (i + 1) / 7;
-    const ringW = tunnelWidth * d * 0.5;
-    const ringH = tunnelHeight * d * 0.5;
+    const ringW = tunnelWidth * d * 0.5, ringH = tunnelHeight * d * 0.5;
     const alpha = (1 - d) * 0.3 * (1 - tunnelLight);
-    tunnelCtx.strokeStyle = `rgba(80,80,100, ${alpha})`;
+    tunnelCtx.strokeStyle = `rgba(80,80,100,${alpha})`;
+    tunnelCtx.lineWidth = 3;
     tunnelCtx.beginPath();
     tunnelCtx.ellipse(cx, cy * 0.85, ringW, ringH, 0, 0, TAU);
     tunnelCtx.stroke();
   }
 
-  // When light is bright enough, show stadium glimpse
   if (tunnelLight > 0.5) {
     const fieldAlpha = (tunnelLight - 0.5) * 2;
-    // Green field glimpse
     const fGrad = tunnelCtx.createRadialGradient(cx, cy, 0, cx, cy, outerRad * 0.6);
-    fGrad.addColorStop(0, `rgba(46, 125, 50, ${fieldAlpha * 0.4})`);
+    fGrad.addColorStop(0, `rgba(46,125,50,${fieldAlpha * 0.4})`);
     fGrad.addColorStop(1, 'rgba(0,0,0,0)');
     tunnelCtx.fillStyle = fGrad;
     tunnelCtx.fillRect(0, 0, W, H);
   }
 
-  // Bright light flare when exiting
   if (tunnelLight > 0.8) {
-    const flareAlpha = (tunnelLight - 0.8) * 5;
-    tunnelCtx.fillStyle = `rgba(255,255,255, ${Math.min(1, flareAlpha)})`;
+    tunnelCtx.fillStyle = `rgba(255,255,255,${Math.min(1, (tunnelLight - 0.8) * 5)})`;
     tunnelCtx.fillRect(0, 0, W, H);
   }
 }
 
 function endTunnel() {
-  // Flash white and transition
+  if (tunnelAborted) return;
+  tunnelAborted = true;
   const flash = document.createElement('div');
   flash.className = 'screen-flash';
   document.body.appendChild(flash);
   setTimeout(() => flash.remove(), 700);
-
   tunnelOverlay.style.display = 'none';
   showMatchupCard();
 }
 
 function skipTunnel() {
+  if (tunnelAborted) return;
+  tunnelAborted = true;
+  // Cancel all pending tunnel timeouts
+  for (const t of tunnelTimeouts) clearTimeout(t);
+  tunnelTimeouts = [];
   tunnelOverlay.style.display = 'none';
   showMatchupCard();
 }
@@ -2290,29 +2270,89 @@ function startGameplay() {
   scoreboardEl.classList.add('visible');
   updateScoreboard();
 
-  // Intro commentary
-  const intro = GAME_DEFS[currentGame].introCommentary;
-  for (const line of intro) {
-    showCommentary(line.pbp, line.color, 4000);
-  }
+  // Intro commentary for this game
+  const intros = [
+    [
+      { pbp: "Welcome to your first game, Jade!", color: "You're the Patriots. Your job? Get the ball to the end zone. Let's learn as we go!" },
+      { pbp: "Pick a play card below to get started.", color: "Don't overthink it — just pick one and let's see what happens!" }
+    ],
+    [
+      { pbp: "Game 2 — time to throw the ball!", color: "You've got new plays now. After the snap, tap a receiver to throw to them!" },
+    ],
+    [
+      { pbp: "Game 3 — things get real.", color: "Watch out for penalties and turnovers. And if you're close, try a field goal!" },
+    ],
+    [
+      { pbp: "The clock matters now.", color: "Running eats clock. Incomplete passes stop it. Think before you pick!" },
+    ],
+    [
+      { pbp: "THIS IS IT. The Super Bowl!", color: "Everything you've learned comes together. Win this and you've MASTERED football!" },
+    ]
+  ];
 
-  // Setup and show play cards
+  const intro = intros[currentGame] || intros[0];
+  for (const line of intro) showCommentary(line.pbp, line.color, 4500);
+
   setupFormation('run');
-  setTimeout(() => {
-    showPlayCards();
-  }, 1500);
+  setTimeout(() => startNextPlay(), 2000);
+}
+
+// ---- SAVE / RESTORE STATE ----
+function saveState() {
+  try {
+    const state = {
+      currentGame, patsScore, seaScore, down, yardsToGo, ballYard,
+      quarter, gameClock, driveCount, playsThisDrive, isPatsOffense,
+      taughtMoments: [...taughtMoments],
+      gameState: gameState === 'GAME_OVER' ? 'GAME_OVER' : 'PLAY_CALL'
+    };
+    localStorage.setItem('jades-game-save', JSON.stringify(state));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('jades-game-save');
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+    if (!state || state.currentGame === undefined) return false;
+
+    currentGame = state.currentGame;
+    patsScore = state.patsScore || 0;
+    seaScore = state.seaScore || 0;
+    down = state.down || 1;
+    yardsToGo = state.yardsToGo || 10;
+    ballYard = state.ballYard || 25;
+    quarter = state.quarter || 1;
+    gameClock = state.gameClock || 900;
+    driveCount = state.driveCount || 0;
+    playsThisDrive = state.playsThisDrive || 0;
+    isPatsOffense = state.isPatsOffense !== false;
+    taughtMoments = new Set(state.taughtMoments || []);
+
+    return true;
+  } catch(e) { return false; }
+}
+
+function clearSave() {
+  try { localStorage.removeItem('jades-game-save'); } catch(e) {}
 }
 
 // ---- TOUCH INPUT ----
 let lastTouchTime = 0;
-document.addEventListener('touchstart', (e) => { lastTouchTime = Date.now(); handleTouch(e); }, { passive: false });
-document.addEventListener('click', (e) => { if (Date.now() - lastTouchTime < 500) return; handleTouch(e); });
+document.addEventListener('touchstart', (e) => {
+  lastTouchTime = Date.now();
+  handleTouch(e);
+}, { passive: false });
+
+document.addEventListener('click', (e) => {
+  if (Date.now() - lastTouchTime < 500) return;
+  handleTouch(e);
+});
 
 function handleTouch(e) {
-  // Initialize audio on first touch
-  if (!audioUnlocked) {
-    initAudio();
-  }
+  if (!audioUnlocked) initAudio();
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 
   const touch = e.touches ? e.touches[0] : e;
   const x = touch.clientX, y = touch.clientY;
@@ -2338,15 +2378,7 @@ function handleTouch(e) {
 
   if (gameState === 'MOMENT') {
     e.preventDefault();
-    hideMoment();
-    // Return to previous state
-    gameState = 'PLAY_RESULT';
-    setTimeout(() => {
-      if (gameState === 'PLAY_RESULT') {
-        // Check if we need to continue
-        startNextPlay();
-      }
-    }, 300);
+    dismissMoment();
     return;
   }
 
@@ -2359,14 +2391,29 @@ function handleTouch(e) {
   if (gameState === 'PASS_TARGET') {
     // Check if they tapped a receiver
     for (const rt of receiverTargets) {
-      const dx = x - rt.screenX;
-      const dy = y - rt.screenY;
-      if (Math.sqrt(dx*dx + dy*dy) < 40) {
+      const dx = x - rt.screenX, dy = y - rt.screenY;
+      if (Math.sqrt(dx*dx + dy*dy) < 50) {
         e.preventDefault();
         throwToReceiver(rt);
         return;
       }
     }
+    // ESCAPE: If user taps empty space, throw to nearest receiver (don't get stuck)
+    if (receiverTargets.length > 0) {
+      e.preventDefault();
+      let nearest = receiverTargets[0], bestDist = Infinity;
+      for (const rt of receiverTargets) {
+        const dx = x - rt.screenX, dy = y - rt.screenY;
+        const dist = dx*dx + dy*dy;
+        if (dist < bestDist) { bestDist = dist; nearest = rt; }
+      }
+      throwToReceiver(nearest);
+    }
+    return;
+  }
+
+  if (gameState === 'GAME_OVER') {
+    // taps on game over handled by button listeners
     return;
   }
 }
@@ -2376,26 +2423,21 @@ function render(time) {
   const dt = Math.min(0.05, (time - (lastFrameTime || time)) / 1000);
   lastFrameTime = time;
 
-  // Clear
   ctx.clearRect(0, 0, W, H);
 
-  // Camera shake
-  if (cameraShake > 0) {
+  // Camera shake — always matched save/restore
+  cameraShakeActive = cameraShake > 0.1;
+  if (cameraShakeActive) {
     ctx.save();
-    ctx.translate(
-      (Math.random() - 0.5) * cameraShake,
-      (Math.random() - 0.5) * cameraShake
-    );
+    ctx.translate((Math.random() - 0.5) * cameraShake, (Math.random() - 0.5) * cameraShake);
     cameraShake *= 0.9;
     if (cameraShake < 0.1) cameraShake = 0;
   }
 
-  // Draw field always (behind everything)
   if (gameState !== 'TITLE' && gameState !== 'TUNNEL') {
     drawField();
 
-    // Draw players based on game state
-    if (gameState === 'PLAY_CALL' || gameState === 'SNAP_WAIT') {
+    if (gameState === 'PLAY_CALL' || gameState === 'SNAP_WAIT' || gameState === 'MOMENT') {
       drawFormation(false);
       drawBall(0, 0.22, false);
     } else if (gameState === 'PASS_TARGET') {
@@ -2403,7 +2445,7 @@ function render(time) {
       drawBall(0, 0.22, false);
     } else if (gameState === 'PLAY_ACTIVE') {
       drawPlayAnimation(selectedPlay);
-    } else if (gameState === 'PLAY_RESULT') {
+    } else if (gameState === 'PLAY_RESULT' || gameState === 'SCORE_ANIM') {
       drawFormation(false);
     } else {
       drawFormation(false);
@@ -2412,23 +2454,35 @@ function render(time) {
     drawParticles();
   }
 
-  // Tunnel rendering
-  if (gameState === 'TUNNEL') {
-    drawTunnel();
-  }
+  if (gameState === 'TUNNEL') drawTunnel();
 
-  if (cameraShake > 0) {
-    ctx.restore();
-  }
+  // Always restore if we saved
+  if (cameraShakeActive) ctx.restore();
 
-  // Update particles
   updateParticles(dt);
+
+  // Auto-save periodically
+  if (Math.random() < 0.002 && gameState === 'PLAY_CALL') saveState();
 
   requestAnimationFrame(render);
 }
 
-// ---- START ----
-requestAnimationFrame(render);
+// ---- BOOT ----
+function boot() {
+  // Try to load saved state
+  const hasSave = loadState();
+
+  if (hasSave && gameState !== 'TITLE') {
+    // Resume from save — skip title/tunnel, go to matchup
+    titleScreen.style.display = 'none';
+    showMatchupCard();
+  }
+  // Otherwise start at title screen (default)
+
+  requestAnimationFrame(render);
+}
+
+boot();
 
 })();
 </script>

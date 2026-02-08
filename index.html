@@ -197,6 +197,26 @@ canvas#game {
   text-align: center;
   padding-bottom: 4px;
 }
+.skip-btn {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.6);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 5;
+}
+.skip-btn:active {
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+}
 
 /* ======= PLAY CARDS ======= */
 #play-cards {
@@ -720,6 +740,7 @@ canvas#game {
   <!-- Scoreboard -->
   <div id="scoreboard">
     <div class="game-label" id="game-label">Game 1 — The Basics</div>
+    <button class="skip-btn" id="skip-game">SKIP &raquo;</button>
     <div class="score-row">
       <div class="team-score">
         <div class="team-logo pats">NE</div>
@@ -1831,6 +1852,9 @@ function dismissMoment() {
   if (pendingResolve) {
     const fn = pendingResolve;
     pendingResolve = null;
+    // Reset state before calling resolve — otherwise gameState stays 'MOMENT'
+    // and any code checking state (like startNextPlay) will think a moment is still showing
+    gameState = restoreTo || 'PLAY_RESULT';
     fn();
     return;
   }
@@ -1869,6 +1893,7 @@ function updateScoreboard() {
   $('sea-possession').classList.toggle('active', !isPatsOffense);
   const gameNames = ['The Basics', 'Air It Out', 'The Full Picture', 'Clock Management', 'The Super Bowl'];
   $('game-label').textContent = `Game ${currentGame + 1} — ${gameNames[currentGame]}`;
+  $('skip-game').style.display = currentGame < 4 ? 'block' : 'none';
 }
 
 // ---- PLAY CARDS ----
@@ -2295,6 +2320,15 @@ $('btn-next').addEventListener('click', () => {
 });
 
 $('btn-replay').addEventListener('click', () => { startNewGame(); });
+
+// Skip to next game
+$('skip-game').addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (currentGame < 4) {
+    currentGame++;
+    startNewGame();
+  }
+});
 
 function startNewGame() {
   gameOverEl.style.display = 'none';

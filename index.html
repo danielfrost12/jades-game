@@ -2168,7 +2168,6 @@ function checkDowns() {
 }
 
 function advanceClock(seconds) {
-  if (currentGame < 3) return;
   gameClock = Math.max(0, gameClock - seconds);
   if (gameClock <= 120 && !taughtMoments.has('two_minute') && currentGame >= 3) {
     queueMoment('two_minute');

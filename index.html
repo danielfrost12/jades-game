@@ -851,6 +851,7 @@ let totalDrivesPerHalf = 5;
 let lastFrameTime = 0;
 let pendingResolve = null; // deferred play resolution callback
 let gameTimeouts = []; // track all game timeouts for cleanup
+let stuckTimer = 0; // watchdog: detect stuck states
 
 let offensePlayers = [];
 let defensePlayers = [];
@@ -1843,7 +1844,7 @@ function dismissMoment() {
 
   // If there are more moments queued, show the next one after a brief delay
   if (momentQueue.length > 0) {
-    setTimeout(() => showNextMoment(), 400);
+    gameTimeout(() => showNextMoment(), 400);
     return;
   }
 
@@ -2087,7 +2088,8 @@ function handleTouchdown() {
   spawnConfetti(W / 2, H * 0.4);
   cameraShake = 6;
 
-  setTimeout(() => {
+  gameTimeout(() => {
+    if (gameState === 'ENDING' || gameState === 'GAME_OVER') return;
     patsScore += 7;
     updateScoreboard();
     advanceClock(40);
@@ -2106,7 +2108,8 @@ function handleInterception() {
   spawnParticles(W / 2, H * 0.4, 20, SEA.secondary, 3, 1);
   playSound('crowd_groan');
 
-  setTimeout(() => {
+  gameTimeout(() => {
+    if (gameState === 'ENDING' || gameState === 'GAME_OVER') return;
     advanceClock(30);
     if (momentQueue.length > 0) {
       setPendingResolve(() => endPossession());
@@ -2119,7 +2122,8 @@ function handleInterception() {
 
 function handleIncomplete() {
   queueMoment('incomplete');
-  advanceClock(currentGame >= 3 ? 0 : 15);
+  // Incomplete passes stop the clock (0 seconds)
+  advanceClock(0);
   down++;
 
   if (momentQueue.length > 0) {
@@ -2252,6 +2256,9 @@ function startNextPlay() {
   // Don't start plays if game is ending or already over
   if (gameState === 'ENDING' || gameState === 'GAME_OVER') return;
 
+  // If already in PLAY_CALL with cards visible, don't double-start
+  if (gameState === 'PLAY_CALL' && playCardsEl.classList.contains('visible')) return;
+
   // If moment is showing, wait
   if (gameState === 'MOMENT') {
     setPendingResolve(() => startNextPlay());
@@ -2324,7 +2331,15 @@ $('btn-replay').addEventListener('click', () => { startNewGame(); });
 // Skip to next game
 $('skip-game').addEventListener('click', (e) => {
   e.stopPropagation();
-  if (currentGame < 4) {
+  if (currentGame < 4 && gameState !== 'ENDING' && gameState !== 'GAME_OVER') {
+    currentGame++;
+    startNewGame();
+  }
+});
+$('skip-game').addEventListener('touchend', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  if (currentGame < 4 && gameState !== 'ENDING' && gameState !== 'GAME_OVER') {
     currentGame++;
     startNewGame();
   }
@@ -2339,6 +2354,7 @@ function startNewGame() {
   driveCount = 0; playsThisDrive = 0;
   isPatsOffense = true; particles = [];
   momentQueue = []; pendingResolve = null;
+  stuckTimer = 0;
   clearCommentary();
   showMatchupCard();
   saveState();
@@ -2563,8 +2579,17 @@ function momentTapHandler(e) {
     momentDismissing = true;
     momentCard.classList.remove('visible');
     dimOverlay.classList.remove('visible');
-    if (pendingResolve) { const fn = pendingResolve; pendingResolve = null; fn(); }
-    else { gameState = 'PLAY_CALL'; setupFormation('run'); showPlayCards(); }
+    momentQueue = []; // clear any remaining queued moments
+    if (pendingResolve) {
+      const fn = pendingResolve;
+      pendingResolve = null;
+      gameState = 'PLAY_RESULT'; // reset from corrupted state before calling resolve
+      fn();
+    } else {
+      gameState = 'PLAY_CALL';
+      setupFormation('run');
+      showPlayCards();
+    }
     setTimeout(() => { momentDismissing = false; }, 300);
   }
 }
@@ -2733,6 +2758,18 @@ function render(time) {
 
   // Auto-save periodically
   if (Math.random() < 0.002 && gameState === 'PLAY_CALL') saveState();
+
+  // WATCHDOG: If game is stuck, force recovery
+  stuckTimer += dt;
+  if (gameState === 'PLAY_CALL' && !playCardsEl.classList.contains('visible')) {
+    // Play call state but no cards showing — force show after 3s
+    if (stuckTimer > 3) { setupFormation('run'); showPlayCards(); stuckTimer = 0; }
+  } else if (gameState === 'PLAY_RESULT' || gameState === 'INTRO') {
+    // These are transient states — if stuck for 8s, force to PLAY_CALL
+    if (stuckTimer > 8) { gameState = 'PLAY_CALL'; setupFormation('run'); showPlayCards(); stuckTimer = 0; }
+  } else {
+    stuckTimer = 0;
+  }
 
   requestAnimationFrame(render);
 }

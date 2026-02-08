@@ -2662,6 +2662,7 @@ function startGameplay() {
 function saveState() {
   try {
     const state = {
+      version: 2,
       currentGame, patsScore, seaScore, down, yardsToGo, ballYard,
       quarter, gameClock, driveCount, playsThisDrive, isPatsOffense,
       taughtMoments: [...taughtMoments],
@@ -2677,6 +2678,8 @@ function loadState() {
     if (!raw) return false;
     const state = JSON.parse(raw);
     if (!state || state.currentGame === undefined) return false;
+    // Wipe old saves from before the gameplay overhaul
+    if (!state.version || state.version < 2) { clearSave(); return false; }
 
     currentGame = state.currentGame;
     patsScore = state.patsScore || 0;
@@ -2685,7 +2688,7 @@ function loadState() {
     yardsToGo = state.yardsToGo || 10;
     ballYard = state.ballYard || 25;
     quarter = state.quarter || 1;
-    gameClock = state.gameClock || 300;
+    gameClock = Math.min(state.gameClock || 300, 300); // cap at 5:00
     driveCount = state.driveCount || 0;
     playsThisDrive = state.playsThisDrive || 0;
     isPatsOffense = state.isPatsOffense !== false;
